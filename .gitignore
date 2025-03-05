@@ -1,0 +1,35 @@
+# General ignore patterns
+
+.env
+
+*.log
+
+*.tmp
+
+*.swp
+
+
+
+# Build artifacts
+
+/dist
+
+/build
+
+node_modules
+
+# Server-specific
+
+/server/node_modules
+
+/server/config.local.js 
+
+/server/database.sql  
+
+
+
+# Client-specific
+
+/client/node_modules
+
+/client/public/cache/* 
