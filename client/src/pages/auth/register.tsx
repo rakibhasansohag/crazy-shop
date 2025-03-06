@@ -1,7 +1,8 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import CommonForm from '../../components/common/form';
-import { registerFormControls } from '../../config';
+import CommonForm from '@/components/common/form';
+import { registerFormControls } from '@/config';
 
 const AuthRegister = () => {
 	const initialState: Record<string, string> = {
@@ -19,11 +20,28 @@ const AuthRegister = () => {
 
 	return (
 		<div className='mx-auto w-full max-w-md space-y-6'>
-			<div className='text-center'>
-				<h1 className='text-3xl font-bold text-foreground tracking-tight'>
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				exit={{ opacity: 0 }}
+				transition={{ duration: 0.5 }}
+			>
+				<motion.h1
+					className=' text-center text-3xl font-bold text-foreground tracking-tight'
+					initial={{ x: -100 }}
+					animate={{ x: 0 }}
+					exit={{ x: 100 }}
+					transition={{ duration: 0.5 }}
+				>
 					Create a new account
-				</h1>
-				<p className='mt-2'>
+				</motion.h1>
+				<motion.p
+					className='mt-2 text-center'
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{ duration: 1 }}
+				>
 					Already have an account?{' '}
 					<Link
 						to='/auth/login'
@@ -31,15 +49,25 @@ const AuthRegister = () => {
 					>
 						Login
 					</Link>{' '}
-				</p>
-			</div>
-			<CommonForm
-				formControls={registerFormControls}
-				buttonText='Sign Up'
-				formData={formData}
-				setFormData={setFormData}
-				onSubmit={onSubmit}
-			/>
+				</motion.p>
+			</motion.div>
+			<AnimatePresence>
+				<motion.div
+					key='register-form'
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{ duration: 0.5 }}
+				>
+					<CommonForm
+						formControls={registerFormControls}
+						buttonText='Sign Up'
+						formData={formData}
+						setFormData={setFormData}
+						onSubmit={onSubmit}
+					/>
+				</motion.div>
+			</AnimatePresence>
 		</div>
 	);
 };
