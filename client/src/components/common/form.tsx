@@ -15,7 +15,7 @@ interface FormControls {
 	name: string;
 	label: string;
 	placeholder?: string;
-	componentType: 'input' | 'select' | 'textarea';
+	componentType: string;
 	type?: InputHTMLAttributes<HTMLInputElement>['type'];
 	id?: string;
 	options?: { id: string; label: string }[];
