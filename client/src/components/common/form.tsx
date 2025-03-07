@@ -21,10 +21,12 @@ interface FormControls {
 	options?: { id: string; label: string }[];
 }
 
-interface CommonFormProps {
+interface CommonFormProps<
+	T extends Record<string, string> = Record<string, string>,
+> {
 	formControls: FormControls[];
-	formData: Record<string, string>;
-	setFormData: (formData: Record<string, string>) => void;
+	formData: T;
+	setFormData: (formData: T) => void;
 	onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 	buttonText?: string;
 	isBtnDisabled?: boolean;
@@ -139,7 +141,11 @@ function CommonForm({
 					</div>
 				))}
 			</div>
-			<Button disabled={isBtnDisabled} type='submit' className='mt-2 w-full'>
+			<Button
+				disabled={isBtnDisabled}
+				type='submit'
+				className='mt-2 w-full cursor-pointer hover:bg-amber-600'
+			>
 				{buttonText || 'Submit'}
 			</Button>
 		</form>

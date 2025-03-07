@@ -1,8 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CommonForm from '@/components/common/form';
 import { registerFormControls } from '@/config';
+import { useDispatch } from 'react-redux';
+import { registerUser } from '../../store/auth-slice';
+import { toast } from 'sonner';
+
+import type { AppDispatch } from '../../store/store';
 
 const AuthRegister = () => {
 	const initialState: Record<string, string> = {
@@ -13,9 +18,22 @@ const AuthRegister = () => {
 
 	const [formData, setFormData] = useState(initialState);
 
+	const dispatch = useDispatch<AppDispatch>();
+	const navigate = useNavigate();
+
 	function onSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		return console.log(formData);
+		console.log(formData);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		dispatch(registerUser(formData as any))
+			.unwrap()
+			.then((payload) => {
+				toast.success(payload.message);
+				navigate('/auth/login');
+			})
+			.catch((error: { message?: string }) => {
+				toast.error(error.message || 'An error occurred during registration.');
+			});
 	}
 
 	return (
