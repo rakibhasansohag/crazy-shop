@@ -88,6 +88,12 @@ const loginUser = async (req, res) => {
 };
 
 // Point: Logout User
+const logoutUser = (req, res) => {
+	res.clearCookie('token').json({
+		success: true,
+		message: 'Logged out successfully!',
+	});
+};
 
 // Point: Auth middleware / protect routes
 
@@ -95,4 +101,5 @@ const loginUser = async (req, res) => {
 module.exports = {
 	registerUser,
 	loginUser,
+	logoutUser,
 };

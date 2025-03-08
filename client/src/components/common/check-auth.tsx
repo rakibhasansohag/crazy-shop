@@ -8,6 +8,19 @@ interface CheckAuthProps {
 	children: React.ReactNode;
 }
 
+/**
+ * A component that checks if the user is authenticated and redirects
+ * them to the right page. If the user is not authenticated, they will
+ * be redirected to the login page. If the user is authenticated, they
+ * will be redirected to the home page based on their role. If the user
+ * is trying to access a page that they don't have access to, they will
+ * be redirected to the unauth-page.
+ *
+ * @param {boolean} isAuthenticated - Whether the user is authenticated.
+ * @param {{ role: string } | null} user - The user object with their role.
+ * @param {React.ReactNode} children - The children of the component.
+ * @returns {React.ReactElement} A React element that will be rendered.
+ */
 function CheckAuth({ isAuthenticated, user, children }: CheckAuthProps) {
 	const location = useLocation();
 
