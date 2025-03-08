@@ -23,16 +23,20 @@ const AuthRegister = () => {
 
 	function onSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		console.log(formData);
+
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		dispatch(registerUser(formData as any))
 			.unwrap()
 			.then((payload) => {
+				console.log(payload);
 				toast.success(payload.message);
 				navigate('/auth/login');
 			})
 			.catch((error: { message?: string }) => {
-				toast.error(error.message || 'An error occurred during registration.');
+				console.log(error);
+				return toast.error(
+					error.message || 'An error occurred during registration.',
+				);
 			});
 	}
 
