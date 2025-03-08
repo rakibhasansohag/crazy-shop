@@ -2,18 +2,36 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CommonForm from '@/components/common/form';
 import { loginFormControls } from '@/config';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
+import { loginUser } from '../../store/auth-slice';
+import { toast } from 'sonner';
 
 const AuthLogin = () => {
 	const initialState: Record<string, string> = {
 		email: '',
 		password: '',
 	};
+	const dispatch = useDispatch<AppDispatch>();
 
 	const [formData, setFormData] = useState(initialState);
 
 	function onSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		return console.log(formData);
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		dispatch(loginUser(formData as any))
+			.unwrap()
+			.then((payload) => {
+				if (!payload.success) return toast.error(payload.message);
+				toast.success(payload.message);
+			})
+			.catch((error: { message?: string }) => {
+				// console.log(error);
+				return toast.error(
+					error.message || 'An error occurred during registration.',
+				);
+			});
 	}
 
 	return (

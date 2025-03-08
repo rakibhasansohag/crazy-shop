@@ -28,12 +28,12 @@ const AuthRegister = () => {
 		dispatch(registerUser(formData as any))
 			.unwrap()
 			.then((payload) => {
-				console.log(payload);
+				if (!payload.success) return toast.error(payload.message);
 				toast.success(payload.message);
 				navigate('/auth/login');
 			})
 			.catch((error: { message?: string }) => {
-				console.log(error);
+				// console.log(error);
 				return toast.error(
 					error.message || 'An error occurred during registration.',
 				);

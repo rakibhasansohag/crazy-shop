@@ -11,17 +11,7 @@ createRoot(document.getElementById('root')!).render(
 	<BrowserRouter>
 		<Provider store={store}>
 			<App />
-			<Toaster
-				position='top-center'
-				toastOptions={{
-					className: 'sonner',
-					duration: 3000,
-					style: {
-						background: '#1f2937',
-						color: '#fff',
-					},
-				}}
-			/>
+			<Toaster position='top-center' richColors />
 		</Provider>
 	</BrowserRouter>,
 );
