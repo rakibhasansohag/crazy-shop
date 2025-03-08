@@ -20,9 +20,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AuthState, checkAuth } from './store/auth-slice';
 import { AppDispatch } from './store/store';
 import { useEffect } from 'react';
+import Loading from './pages/loading';
 
 function App() {
-	const { isAuthenticated, user } = useSelector(
+	const { isAuthenticated, user, isLoading } = useSelector(
 		(state: { auth: AuthState }) => state.auth,
 	);
 	const dispatch = useDispatch<AppDispatch>();
@@ -30,6 +31,8 @@ function App() {
 	useEffect(() => {
 		dispatch(checkAuth());
 	}, [dispatch]);
+
+	if (isLoading) return <Loading />;
 
 	return (
 		<div className='flex flex-col overflow-hidden bg-white'>
