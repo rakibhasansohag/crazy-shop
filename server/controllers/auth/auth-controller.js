@@ -96,10 +96,31 @@ const logoutUser = (req, res) => {
 };
 
 // Point: Auth middleware / protect routes
+const authMiddleware = async (req, res, next) => {
+	const token = req.cookies.token;
+
+	if (!token)
+		return res
+			.status(401)
+			.json({ success: false, message: 'Unauthorized User!' });
+	try {
+		const decoded = jwt.verify(token, 'CLIENT_SECRET_KEY');
+		req.user = decoded;
+		next();
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({
+			success: false,
+			message: 'Unauthorized User!',
+			error: error?.message || error.error,
+		});
+	}
+};
 
 // Point: exporting controller functions
 module.exports = {
 	registerUser,
 	loginUser,
 	logoutUser,
+	authMiddleware,
 };
