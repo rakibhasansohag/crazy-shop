@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CommonForm from '../../components/common/form';
 import { Button } from '../../components/ui/button';
 import {
@@ -12,7 +12,7 @@ import { addProductFormElements } from '../../config';
 import ProductImageUpload from '../../components/admin-view/image-upload';
 
 const initialFormData: Record<string, any> = {
-	image: null,
+	image: null as File | null,
 	title: '',
 	description: '',
 	category: '',
@@ -27,7 +27,7 @@ const AdminProducts = () => {
 	const [openCreateProductsDialog, setOpenCreateProductsDialog] =
 		useState(false);
 	const [formData, setFormData] = useState(initialFormData);
-	const [imageFile, setImageFile] = useState(null);
+	const [imageFile, setImageFile] = useState<File | null>(null);
 	const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 	const [imageLoadingState, setImageLoadingState] = useState(false);
 	const [currentEditedId, setCurrentEditedId] = useState(null);
@@ -35,6 +35,13 @@ const AdminProducts = () => {
 	function onSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 	}
+
+	useEffect(() => {
+		if (!openCreateProductsDialog) {
+			setImageFile(null);
+			setUploadedImageUrl('');
+		}
+	}, [openCreateProductsDialog]);
 
 	return (
 		<>
