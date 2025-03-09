@@ -6,9 +6,9 @@ const {
 	editProduct,
 	fetchAllProducts,
 	deleteProduct,
-} = require('@/controllers/admin/products-controller');
+} = require('../../controllers/admin/products-controller');
 
-const { upload } = require('@/helpers/cloudinary');
+const { upload } = require('../../helpers/cloudinary');
 
 const router = express.Router();
 

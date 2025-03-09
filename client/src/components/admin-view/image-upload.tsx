@@ -69,6 +69,10 @@ function ProductImageUpload({
 		if (response?.data?.success) {
 			setUploadedImageUrl(response.data.result.url);
 			setImageLoadingState(false);
+		} else {
+			const error = response?.data?.message || 'An unknown error occurred';
+			console.error(error);
+			setImageLoadingState(false);
 		}
 	}
 
