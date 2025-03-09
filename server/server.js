@@ -7,6 +7,7 @@ dotenv.config();
 
 
 const authRouter = require('./routes/auth/auth-routes');
+const adminProductsRouter = require('./routes/admin/products-routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -40,6 +41,8 @@ app.use(
 	}),
 );
 app.use('/api/auth', authRouter);
+app.use('api/admin/products', adminProductsRouter);
+
 
 // Point: Listening
 app.listen(PORT, () => {
