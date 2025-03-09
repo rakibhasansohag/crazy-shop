@@ -56,6 +56,26 @@ function ProductImageUpload({
 		}
 	}
 
+	async function uploadImageToCloudinary() {
+		setImageLoadingState(true);
+		const data = new FormData();
+		data.append('crazy_shop', imageFile as Blob);
+		const response = await axios.post(
+			'http://localhost:4000/api/admin/products/upload-image',
+			data,
+		);
+		console.log(response, 'response');
+
+		if (response?.data?.success) {
+			setUploadedImageUrl(response.data.result.url);
+			setImageLoadingState(false);
+		}
+	}
+
+	useEffect(() => {
+		if (imageFile !== null) uploadImageToCloudinary();
+	}, [imageFile]);
+
 	return (
 		<div
 			className={`w-full  mt-4 ${isCustomStyling ? '' : 'max-w-md mx-auto'}`}
