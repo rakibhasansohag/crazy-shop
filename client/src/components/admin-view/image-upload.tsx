@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { Button } from '../ui/button';
 import axios from 'axios';
 import { Skeleton } from '../ui/skeleton';
+import { toast } from 'sonner';
 
 type ProductImageUploadProps = {
 	imageFile: File | null;
@@ -58,21 +59,33 @@ function ProductImageUpload({
 
 	async function uploadImageToCloudinary() {
 		setImageLoadingState(true);
-		const data = new FormData();
-		data.append('crazy_shop', imageFile as Blob);
-		const response = await axios.post(
-			'http://localhost:4000/api/admin/products/upload-image',
-			data,
-		);
-		console.log(response, 'response');
+		try {
+			const data = new FormData();
+			data.append('crazy_shop', imageFile as Blob);
 
-		if (response?.data?.success) {
-			setUploadedImageUrl(response.data.result.url);
+			console.log('Uploading file:', imageFile);
+			const response = await axios.post(
+				'http://localhost:4000/api/admin/products/upload-image',
+				data,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				},
+			);
+			console.log(response);
+			if (response?.data?.success) {
+				setUploadedImageUrl(response?.data?.result);
+				setImageLoadingState(false);
+				toast.success('Image uploaded successfully.');
+			} else {
+				throw new Error(response.data.message || 'Upload failed');
+			}
+		} catch (error) {
+			console.error('Upload error:', error);
 			setImageLoadingState(false);
-		} else {
-			const error = response?.data?.message || 'An unknown error occurred';
-			console.error(error);
-			setImageLoadingState(false);
+
+			toast.error('Image upload failed. Please try again.');
 		}
 	}
 
