@@ -1,7 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from 'react';
 import { Product } from '../../store/admin/products-slice';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardFooter } from '../ui/card';
+
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '../ui/alert-dialog';
 
 type AdminProductTileProps = {
 	product: Product;
@@ -18,6 +31,8 @@ function AdminProductTile({
 	setCurrentEditedId,
 	handleDelete,
 }: AdminProductTileProps) {
+	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
 	return (
 		<Card className='w-full max-w-sm mx-auto'>
 			<div>
@@ -53,7 +68,35 @@ function AdminProductTile({
 					>
 						Edit
 					</Button>
-					<Button onClick={() => handleDelete(product?._id)}>Delete</Button>
+
+					<AlertDialog
+						open={showDeleteDialog}
+						onOpenChange={setShowDeleteDialog}
+					>
+						<AlertDialogTrigger asChild>
+							<Button variant='destructive' className='text-white'>
+								Delete
+							</Button>
+						</AlertDialogTrigger>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+								<AlertDialogDescription>
+									This action cannot be undone. This will permanently delete the
+									product and remove its data from our servers.
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction
+									onClick={() => handleDelete(product._id)}
+									className='bg-destructive text-white hover:bg-destructive/90 '
+								>
+									Confirm Delete
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
 				</CardFooter>
 			</div>
 		</Card>

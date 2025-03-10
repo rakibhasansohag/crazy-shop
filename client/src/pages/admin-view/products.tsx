@@ -90,9 +90,16 @@ const AdminProducts = () => {
 		dispatch(deleteProduct(getCurrentProductId)).then((data) => {
 			if (data?.payload?.success) {
 				dispatch(fetchAllProducts());
+				toast.success('Product deleted successfully');
+			} else {
+				toast.error(
+					data?.payload?.message ||
+						'An error occurred during deleting the product.',
+				);
 			}
 		});
 	}
+
 	function isFormValid() {
 		return Object.keys(formData)
 			.filter((currentKey) => currentKey !== 'averageReview')
