@@ -20,6 +20,7 @@ import {
 } from '../../store/admin/products-slice';
 import { toast } from 'sonner';
 import AdminProductTile from '../../components/admin-view/product-tile';
+import NoProducts from '../no-product';
 
 const initialFormData: Record<string, any> = {
 	image: null as File | null,
@@ -122,17 +123,22 @@ const AdminProducts = () => {
 				</Button>
 			</div>
 			<div className='grid gap-4 md:grid-cols-3 lg:grid-cols-4'>
-				{productList && productList.length > 0
-					? productList.map((productItem) => (
-							<AdminProductTile
-								setFormData={setFormData}
-								setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-								setCurrentEditedId={setCurrentEditedId}
-								product={productItem}
-								handleDelete={handleDelete}
-							/>
-					  ))
-					: null}
+				{productList && productList.length < 0 ? (
+					productList.map((productItem) => (
+						<AdminProductTile
+							key={productItem._id}
+							setFormData={setFormData}
+							setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+							setCurrentEditedId={setCurrentEditedId}
+							product={productItem}
+							handleDelete={handleDelete}
+						/>
+					))
+				) : (
+					<div className='col-span-full flex justify-center items-center min-h-[60vh]'>
+						<NoProducts onAddNew={() => setOpenCreateProductsDialog(true)} />
+					</div>
+				)}
 			</div>
 			<Sheet
 				open={openCreateProductsDialog}
