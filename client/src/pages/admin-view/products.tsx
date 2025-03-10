@@ -10,6 +10,14 @@ import {
 } from '../../components/ui/sheet';
 import { addProductFormElements } from '../../config';
 import ProductImageUpload from '../../components/admin-view/image-upload';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import {
+	addNewProduct,
+	editProduct,
+	fetchAllProducts,
+} from '../../store/admin/products-slice';
+import { toast } from 'sonner';
 
 const initialFormData: Record<string, any> = {
 	image: null as File | null,
@@ -17,9 +25,9 @@ const initialFormData: Record<string, any> = {
 	description: '',
 	category: '',
 	brand: '',
-	price: '',
-	salePrice: '',
-	totalStock: '',
+	price: 0,
+	salePrice: 0,
+	totalStock: 0,
 	averageReview: 0,
 };
 
@@ -32,9 +40,49 @@ const AdminProducts = () => {
 	const [imageLoadingState, setImageLoadingState] = useState(false);
 	const [currentEditedId, setCurrentEditedId] = useState(null);
 
+	const { productList } = useSelector(
+		(state: RootState) => state.adminProducts,
+	);
+
+	const dispatch = useDispatch<AppDispatch>();
+
 	function onSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
+
+		const productData = {
+			...formData,
+			image: uploadedImageUrl,
+			price: Number(formData.price),
+			salePrice: Number(formData.salePrice),
+			totalStock: Number(formData.totalStock),
+		};
+
+		const action = currentEditedId
+			? dispatch(editProduct({ id: currentEditedId, formData: productData }))
+			: dispatch(addNewProduct(productData));
+
+		action
+			.unwrap()
+			.then(() => {
+				dispatch(fetchAllProducts());
+				setFormData(initialFormData);
+				setOpenCreateProductsDialog(false);
+				setUploadedImageUrl(''); // Reset image URL
+				if (!currentEditedId) toast.success('Product added successfully');
+			})
+			.catch((error) => {
+				toast.error(error.message || 'An error occurred');
+			});
 	}
+
+	useEffect(() => {
+		dispatch(fetchAllProducts());
+	}, [dispatch]);
+
+	console.log({
+		productList,
+		uploadedImageUrl,
+	});
 
 	useEffect(() => {
 		if (!openCreateProductsDialog) {

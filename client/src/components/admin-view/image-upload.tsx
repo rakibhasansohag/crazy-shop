@@ -57,34 +57,59 @@ function ProductImageUpload({
 		}
 	}
 
+	// async function uploadImageToCloudinary() {
+	// 	setImageLoadingState(true);
+	// 	try {
+	// 		const data = new FormData();
+	// 		data.append('crazy_shop', imageFile as Blob);
+
+	// 		console.log('Uploading file:', imageFile);
+	// 		const response = await axios.post(
+	// 			'http://localhost:4000/api/admin/products/upload-image',
+	// 			data,
+	// 			{
+	// 				headers: {
+	// 					'Content-Type': 'multipart/form-data',
+	// 				},
+	// 			},
+	// 		);
+	// 		console.log(response);
+	// 		if (response?.data?.success) {
+	// 			setUploadedImageUrl(response?.data?.result);
+	// 			setImageLoadingState(false);
+	// 			toast.success('Image uploaded successfully.');
+	// 		} else {
+	// 			throw new Error(response.data.message || 'Upload failed');
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Upload error:', error);
+	// 		setImageLoadingState(false);
+
+	// 		toast.error('Image upload failed. Please try again.');
+	// 	}
+	// }
+
 	async function uploadImageToCloudinary() {
 		setImageLoadingState(true);
 		try {
 			const data = new FormData();
 			data.append('crazy_shop', imageFile as Blob);
 
-			console.log('Uploading file:', imageFile);
 			const response = await axios.post(
 				'http://localhost:4000/api/admin/products/upload-image',
 				data,
-				{
-					headers: {
-						'Content-Type': 'multipart/form-data',
-					},
-				},
+				{ headers: { 'Content-Type': 'multipart/form-data' } },
 			);
-			console.log(response);
+
 			if (response?.data?.success) {
-				setUploadedImageUrl(response?.data?.result);
+				// ONLY STORE THE SECURE URL
+				setUploadedImageUrl(response.data.result.secure_url);
 				setImageLoadingState(false);
 				toast.success('Image uploaded successfully.');
-			} else {
-				throw new Error(response.data.message || 'Upload failed');
 			}
 		} catch (error) {
-			console.error('Upload error:', error);
+			console.log(error);
 			setImageLoadingState(false);
-
 			toast.error('Image upload failed. Please try again.');
 		}
 	}

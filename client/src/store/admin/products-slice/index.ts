@@ -1,53 +1,83 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios, { AxiosError } from 'axios';
 
-const initialState = {
-	isLoading: false,
-	productList: [],
-};
-
-export type Products = {
+interface Product {
+	id: string;
 	name: string;
 	image: string;
 	category: string;
 	description: string;
 	price: number;
 	quantity: number;
+}
+
+interface ApiResponse<T> {
+	success: boolean;
+	message: string;
+	data: T;
+}
+
+interface ErrorPayload {
+	message: string;
+	errorCode?: number;
+}
+
+interface AdminProductsState {
+	isLoading: boolean;
+	productList: Product[];
+}
+
+const initialState: AdminProductsState = {
+	isLoading: false,
+	productList: [],
 };
 
-export const addNewProduct = createAsyncThunk(
-	'/products/addnewproduct',
-	async (formData) => {
-		const result = await axios.post(
+export const addNewProduct = createAsyncThunk<
+	ApiResponse<Product>,
+	Partial<Product>,
+	{ rejectValue: ErrorPayload }
+>('/products/addnewproduct', async (formData, { rejectWithValue }) => {
+	try {
+		const result = await axios.post<ApiResponse<Product>>(
 			'http://localhost:4000/api/admin/products/add',
 			formData,
-			{
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			},
+			{ headers: { 'Content-Type': 'application/json' } },
 		);
+		return result.data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ErrorPayload>;
+		return rejectWithValue(
+			axiosError.response?.data || { message: 'Failed to add product' },
+		);
+	}
+});
 
-		return result?.data;
-	},
-);
-
-export const fetchAllProducts = createAsyncThunk(
-	'/products/fetchAllProducts',
-	async () => {
-		const result = await axios.get(
+export const fetchAllProducts = createAsyncThunk<
+	ApiResponse<Product[]>,
+	void,
+	{ rejectValue: ErrorPayload }
+>('/products/fetchAllProducts', async (_, { rejectWithValue }) => {
+	try {
+		const result = await axios.get<ApiResponse<Product[]>>(
 			'http://localhost:4000/api/admin/products/get',
 		);
+		return result.data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ErrorPayload>;
+		return rejectWithValue(
+			axiosError.response?.data || { message: 'Failed to fetch products' },
+		);
+	}
+});
 
-		return result?.data;
-	},
-);
-
-export const editProduct = createAsyncThunk(
-	'/products/editProduct',
-	async ({ id, formData }: { id: string; formData: Products }) => {
-		const result = await axios.put(
+export const editProduct = createAsyncThunk<
+	ApiResponse<Product>,
+	{ id: string; formData: Partial<Product> },
+	{ rejectValue: ErrorPayload }
+>('/products/editProduct', async ({ id, formData }, { rejectWithValue }) => {
+	try {
+		const result = await axios.put<ApiResponse<Product>>(
 			`http://localhost:4000/api/admin/products/edit/${id}`,
 			formData,
 			{
@@ -56,21 +86,32 @@ export const editProduct = createAsyncThunk(
 				},
 			},
 		);
+		return result.data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ErrorPayload>;
+		return rejectWithValue(
+			axiosError.response?.data || { message: 'Failed to edit product' },
+		);
+	}
+});
 
-		return result?.data;
-	},
-);
-
-export const deleteProduct = createAsyncThunk(
-	'/products/deleteProduct',
-	async (id) => {
-		const result = await axios.delete(
+export const deleteProduct = createAsyncThunk<
+	ApiResponse<string>,
+	string,
+	{ rejectValue: ErrorPayload }
+>('/products/deleteProduct', async (id, { rejectWithValue }) => {
+	try {
+		const result = await axios.delete<ApiResponse<string>>(
 			`http://localhost:4000/api/admin/products/delete/${id}`,
 		);
-
-		return result?.data;
-	},
-);
+		return result.data;
+	} catch (error) {
+		const axiosError = error as AxiosError<ErrorPayload>;
+		return rejectWithValue(
+			axiosError.response?.data || { message: 'Failed to delete product' },
+		);
+	}
+});
 
 const AdminProductsSlice = createSlice({
 	name: 'adminProducts',
@@ -81,11 +122,14 @@ const AdminProductsSlice = createSlice({
 			.addCase(fetchAllProducts.pending, (state) => {
 				state.isLoading = true;
 			})
-			.addCase(fetchAllProducts.fulfilled, (state, action) => {
-				state.isLoading = false;
-				state.productList = action.payload.data;
-			})
-			.addCase(fetchAllProducts.rejected, (state, action) => {
+			.addCase(
+				fetchAllProducts.fulfilled,
+				(state, action: PayloadAction<ApiResponse<Product[]>>) => {
+					state.isLoading = false;
+					state.productList = action.payload.data;
+				},
+			)
+			.addCase(fetchAllProducts.rejected, (state) => {
 				state.isLoading = false;
 				state.productList = [];
 			});
