@@ -14,10 +14,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import {
 	addNewProduct,
+	deleteProduct,
 	editProduct,
 	fetchAllProducts,
 } from '../../store/admin/products-slice';
 import { toast } from 'sonner';
+import AdminProductTile from '../../components/admin-view/product-tile';
 
 const initialFormData: Record<string, any> = {
 	image: null as File | null,
@@ -38,7 +40,7 @@ const AdminProducts = () => {
 	const [imageFile, setImageFile] = useState<File | null>(null);
 	const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 	const [imageLoadingState, setImageLoadingState] = useState(false);
-	const [currentEditedId, setCurrentEditedId] = useState(null);
+	const [currentEditedId, setCurrentEditedId] = useState<string | null>(null);
 
 	const { productList } = useSelector(
 		(state: RootState) => state.adminProducts,
@@ -67,7 +69,7 @@ const AdminProducts = () => {
 				dispatch(fetchAllProducts());
 				setFormData(initialFormData);
 				setOpenCreateProductsDialog(false);
-				setUploadedImageUrl(''); // Reset image URL
+				setUploadedImageUrl('');
 				if (!currentEditedId) toast.success('Product added successfully');
 			})
 			.catch((error) => {
@@ -84,6 +86,20 @@ const AdminProducts = () => {
 		uploadedImageUrl,
 	});
 
+	function handleDelete(getCurrentProductId: string) {
+		dispatch(deleteProduct(getCurrentProductId)).then((data) => {
+			if (data?.payload?.success) {
+				dispatch(fetchAllProducts());
+			}
+		});
+	}
+	function isFormValid() {
+		return Object.keys(formData)
+			.filter((currentKey) => currentKey !== 'averageReview')
+			.map((key) => formData[key] !== '')
+			.every((item) => item);
+	}
+
 	useEffect(() => {
 		if (!openCreateProductsDialog) {
 			setImageFile(null);
@@ -99,7 +115,7 @@ const AdminProducts = () => {
 				</Button>
 			</div>
 			<div className='grid gap-4 md:grid-cols-3 lg:grid-cols-4'>
-				{/* {productList && productList.length > 0
+				{productList && productList.length > 0
 					? productList.map((productItem) => (
 							<AdminProductTile
 								setFormData={setFormData}
@@ -109,7 +125,7 @@ const AdminProducts = () => {
 								handleDelete={handleDelete}
 							/>
 					  ))
-					: null} */}
+					: null}
 			</div>
 			<Sheet
 				open={openCreateProductsDialog}
@@ -141,7 +157,7 @@ const AdminProducts = () => {
 							setFormData={setFormData}
 							buttonText={currentEditedId !== null ? 'Edit' : 'Add'}
 							formControls={addProductFormElements}
-							// isBtnDisabled={!isFormValid()}
+							isBtnDisabled={!isFormValid()}
 						/>
 					</div>
 				</SheetContent>

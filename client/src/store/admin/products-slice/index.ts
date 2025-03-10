@@ -2,14 +2,16 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
 
-interface Product {
-	id: string;
-	name: string;
+export interface Product {
+	id?: string;
+	title: string;
 	image: string;
 	category: string;
 	description: string;
-	price: number;
+	salePrice: number;
 	quantity: number;
+	price: number;
+	_id: string;
 }
 
 interface ApiResponse<T> {
@@ -21,6 +23,7 @@ interface ApiResponse<T> {
 interface ErrorPayload {
 	message: string;
 	errorCode?: number;
+	success?: boolean;
 }
 
 interface AdminProductsState {
