@@ -8,6 +8,7 @@ dotenv.config();
 
 const authRouter = require('./routes/auth/auth-routes');
 const adminProductsRouter = require('./routes/admin/products-routes');
+const shopProductsRouter = require('./routes/shop/products-routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,7 +25,7 @@ mongoose
 
 // Middlewares
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
 	cors({
@@ -36,13 +37,13 @@ app.use(
 			'Cache-Control',
 			'expires',
 			'Pragma',
-			'Content-Disposition', 
+			'Content-Disposition',
 		],
 		credentials: true,
 	}),
 );
 
-// File upload middleware 
+// File upload middleware
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Headers', 'Content-Disposition');
 	next();
@@ -51,7 +52,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/admin/products', adminProductsRouter);
-
+app.use('/api/shop', shopProductsRouter);
 // Error handling middleware
 app.use((err, req, res, next) => {
 	console.error(err.stack);
