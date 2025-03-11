@@ -3,6 +3,7 @@ import { Button } from '../ui/button';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '@/store/auth-slice';
 import { AppDispatch } from '../../store/store';
+import { toast } from 'sonner';
 
 type AdminHeaderProps = {
 	setOpen: (open: boolean) => void;
@@ -13,6 +14,7 @@ function AdminHeader({ setOpen }: AdminHeaderProps) {
 
 	function handleLogout() {
 		dispatch(logoutUser());
+		toast.success('Logged out successfully');
 	}
 
 	return (
