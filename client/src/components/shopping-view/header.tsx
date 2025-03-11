@@ -120,6 +120,10 @@ function HeaderRightContent() {
 						<UserCog className='mr-2 h-4 w-4' />
 						Account
 					</DropdownMenuItem>
+					<DropdownMenuItem onClick={() => navigate('/shop/listing')}>
+						<UserCog className='mr-2 h-4 w-4' />
+						Product Lists
+					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={handleLogout}>
 						<LogOut className='mr-2 h-4 w-4' />
