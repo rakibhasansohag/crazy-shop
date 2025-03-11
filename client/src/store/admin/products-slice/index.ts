@@ -12,6 +12,8 @@ export interface Product {
 	quantity: number;
 	price: number;
 	_id: string;
+	totalStock: number;
+	brand: string;
 }
 
 interface ApiResponse<T> {
