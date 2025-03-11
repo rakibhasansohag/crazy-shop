@@ -53,6 +53,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRouter);
 app.use('/api/admin/products', adminProductsRouter);
 app.use('/api/shop', shopProductsRouter);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
 	console.error(err.stack);
