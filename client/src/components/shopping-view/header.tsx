@@ -132,10 +132,6 @@ function HeaderRightContent() {
 }
 
 function ShoppingHeader() {
-	const { isAuthenticated } = useSelector(
-		(state: { auth: AuthState }) => state.auth,
-	);
-
 	return (
 		<header className='sticky top-0 z-40 w-full border-b bg-background'>
 			<div className='flex h-16 items-center justify-between px-4 md:px-6'>
@@ -152,16 +148,14 @@ function ShoppingHeader() {
 					</SheetTrigger>
 					<SheetContent side='left' className='w-full max-w-xs'>
 						<MenuItems />
-						{isAuthenticated && <HeaderRightContent />}
+						{<HeaderRightContent />}
 					</SheetContent>
 				</Sheet>
 				<div className='hidden lg:block'>
 					<MenuItems />
 				</div>
 
-				<div className='hidden lg:block'>
-					{isAuthenticated && <HeaderRightContent />}
-				</div>
+				<div className='hidden lg:block'>{<HeaderRightContent />}</div>
 			</div>
 		</header>
 	);
