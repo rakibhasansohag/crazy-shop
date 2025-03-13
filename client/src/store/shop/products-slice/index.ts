@@ -27,6 +27,9 @@ export const fetchAllFilteredProducts = createAsyncThunk(
 	async (params: { filterParams?: FilterParams; sortParams?: SortParams }) => {
 		const { filterParams = {}, sortParams = 'newest' } = params;
 
+
+		console.log(filterParams, 'filterParams', sortParams, 'sortParams');
+
 		// Convert filter parameters to URLSearchParams compatible format
 		const queryParams: Record<string, string> = {};
 

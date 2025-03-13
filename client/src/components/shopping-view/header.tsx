@@ -33,9 +33,8 @@ interface MenuItemType {
 function MenuItems() {
 	const navigate = useNavigate();
 	const location = useLocation();
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [searchParams, setSearchParams] = useSearchParams();
-
-	console.log(searchParams);
 
 	function handleNavigate(getCurrentMenuItem: MenuItemType) {
 		sessionStorage.removeItem('filters');
@@ -85,8 +84,6 @@ function HeaderRightContent() {
 		dispatch(logoutUser());
 		toast.success('Logged out successfully');
 	}
-
-	console.log('rakib', user);
 
 	return (
 		<div className='flex lg:items-center lg:flex-row flex-col gap-4'>
