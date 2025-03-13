@@ -8,13 +8,13 @@ interface ShoppingProductsState {
 	productDetails: Product | null;
 }
 
-interface FilterParams {
+export interface FilterParams {
 	category?: string[];
 	brand?: string[];
 	priceRange?: [number, number];
 }
 
-type SortParams = 'price_asc' | 'price_desc' | 'newest' | 'popular';
+export type SortParams = 'price_asc' | 'price_desc' | 'newest' | 'popular';
 
 const initialState: ShoppingProductsState = {
 	isLoading: false,

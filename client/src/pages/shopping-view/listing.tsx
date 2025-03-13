@@ -16,7 +16,11 @@ import { sortOptions } from '../../config';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
-import { fetchAllFilteredProducts } from '../../store/shop/products-slice';
+import {
+	fetchAllFilteredProducts,
+	FilterParams,
+	SortParams,
+} from '../../store/shop/products-slice';
 import ShoppingProductTile from './shopping-product-tile';
 import { useSearchParams } from 'react-router-dom';
 
@@ -78,8 +82,14 @@ const ShoppingListing = () => {
 	const { productList } = useSelector((state: RootState) => state.shopProducts);
 
 	useEffect(() => {
-		dispatch(fetchAllFilteredProducts());
-	}, [dispatch]);
+		if (filters !== null && sort !== null)
+			dispatch(
+				fetchAllFilteredProducts({
+					filterParams: filters as FilterParams,
+					sortParams: sort as SortParams,
+				}),
+			);
+	}, [dispatch, filters, sort]);
 
 	console.log(productList, 'productList');
 
@@ -129,7 +139,10 @@ const ShoppingListing = () => {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align='end' className='w-[200px]'>
-								<DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
+								<DropdownMenuRadioGroup
+									value={sort ?? 'price-lowtohigh'}
+									onValueChange={handleSort}
+								>
 									{sortOptions.map((sortItem) => (
 										<DropdownMenuRadioItem
 											value={sortItem.id}
