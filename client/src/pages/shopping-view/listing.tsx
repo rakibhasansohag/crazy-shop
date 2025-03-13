@@ -13,7 +13,7 @@ import {
 	DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu';
 import { sortOptions } from '../../config';
-import { SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { fetchAllFilteredProducts } from '../../store/shop/products-slice';
@@ -47,9 +47,9 @@ const ShoppingListing = () => {
 		console.log(getSectionId, getCurrentOption);
 	};
 
-	// TO handle sort
-	const [sort, setSort] = useState(null);
-	const handleSort = (value: SetStateAction<null>) => {
+	// Point:  TO handle sort
+	const [sort, setSort] = useState<string | null>(null);
+	const handleSort = (value: string) => {
 		setSort(value);
 	};
 
@@ -67,6 +67,16 @@ const ShoppingListing = () => {
 	const handleGetProductDetails = () => {};
 
 	const handleAddToCart = () => {};
+
+	// Point:   all the use effect logic
+	useEffect(() => {
+		setSort('price-lowtohigh');
+		setFilters(
+			typeof sessionStorage.getItem('filters') === 'string'
+				? JSON.parse(sessionStorage.getItem('filters')!)
+				: {},
+		);
+	}, []);
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>
