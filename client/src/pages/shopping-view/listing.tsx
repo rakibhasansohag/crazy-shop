@@ -18,8 +18,28 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { fetchAllFilteredProducts } from '../../store/shop/products-slice';
 import ShoppingProductTile from './shopping-product-tile';
+import { useSearchParams } from 'react-router-dom';
+
+function createSearchParamsHelper(
+	filterParams: Record<string, string[]>,
+): string {
+	const queryParams: string[] = [];
+
+	for (const [key, value] of Object.entries(filterParams)) {
+		if (Array.isArray(value) && value.length > 0) {
+			const paramValue = value.join(',');
+			queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+		}
+	}
+
+	console.log(queryParams, 'queryParams');
+	return queryParams.join('&');
+}
 
 const ShoppingListing = () => {
+	// Search Params Realted Hook & State
+	const [searchParams, setSearchParams] = useSearchParams();
+
 	// Point: to handle filter
 	const [filters, setFilters] = useState<Filters>({
 		category: [],
@@ -77,6 +97,14 @@ const ShoppingListing = () => {
 				: {},
 		);
 	}, []);
+
+	//
+	useEffect(() => {
+		if (filters && Object.keys(filters).length > 0) {
+			const createQueryString = createSearchParamsHelper(filters);
+			setSearchParams(new URLSearchParams(createQueryString));
+		}
+	}, [filters]);
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>
