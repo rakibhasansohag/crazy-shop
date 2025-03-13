@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ArrowUpDownIcon } from 'lucide-react';
-import ProductFilter from '../../components/shopping-view/filter';
+import ProductFilter, {
+	FilterKey,
+	Filters,
+} from '../../components/shopping-view/filter';
 import { Button } from '../../components/ui/button';
 import {
 	DropdownMenu,
@@ -9,15 +13,45 @@ import {
 	DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu';
 import { sortOptions } from '../../config';
-import { useEffect } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import { fetchAllFilteredProducts } from '../../store/shop/products-slice';
 import ShoppingProductTile from './shopping-product-tile';
 
 const ShoppingListing = () => {
-	const sort = sortOptions[0];
-	const handleSort = () => {};
+	// Point: to handle filter
+	const [filters, setFilters] = useState<Filters>({
+		category: [],
+		brand: [],
+	});
+	const handleFilter = (getSectionId: FilterKey, getCurrentOption: string) => {
+		const copyFilter = { ...filters };
+
+		// Check if section exists, otherwise initialize
+		if (!copyFilter[getSectionId]) {
+			copyFilter[getSectionId] = [getCurrentOption];
+		} else {
+			const indexOfCurrentOption =
+				copyFilter[getSectionId].indexOf(getCurrentOption);
+
+			if (indexOfCurrentOption === -1) {
+				copyFilter[getSectionId].push(getCurrentOption);
+			} else {
+				copyFilter[getSectionId].splice(indexOfCurrentOption, 1);
+			}
+		}
+
+		setFilters(copyFilter);
+		sessionStorage.setItem('filters', JSON.stringify(copyFilter));
+		console.log(getSectionId, getCurrentOption);
+	};
+
+	// TO handle sort
+	const [sort, setSort] = useState(null);
+	const handleSort = (value: SetStateAction<null>) => {
+		setSort(value);
+	};
 
 	// Point: TO get and fetch shop product
 	const dispatch = useDispatch<AppDispatch>();
@@ -36,7 +70,7 @@ const ShoppingListing = () => {
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>
-			<ProductFilter handleFilter={() => {}} filters={{}} />
+			<ProductFilter handleFilter={handleFilter} filters={filters} />
 
 			<div className='bg-background w-full rounded-lg shadow-sm'>
 				<div className='p-4 border-b flex items-center justify-between'>

@@ -3,10 +3,10 @@ import { Label } from '../ui/label';
 import { Checkbox } from '../ui/checkbox';
 import { Separator } from '../ui/separator';
 
-type FilterKey = keyof typeof filterOptions;
-type FilterOption = { id: string; label: string };
+export type FilterKey = keyof typeof filterOptions;
+export type FilterOption = { id: string; label: string };
 
-type Filters = {
+export type Filters = {
 	[K in FilterKey]?: string[];
 };
 
