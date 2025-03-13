@@ -9,10 +9,30 @@ import {
 	DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu';
 import { sortOptions } from '../../config';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
+import { fetchAllFilteredProducts } from '../../store/shop/products-slice';
+import ShoppingProductTile from './shopping-product-tile';
 
 const ShoppingListing = () => {
 	const sort = sortOptions[0];
 	const handleSort = () => {};
+
+	// Point: TO get and fetch shop product
+	const dispatch = useDispatch<AppDispatch>();
+	const { productList } = useSelector((state: RootState) => state.shopProducts);
+
+	useEffect(() => {
+		dispatch(fetchAllFilteredProducts());
+	}, [dispatch]);
+
+	console.log(productList, 'productList');
+
+	// to handle filter
+	const handleGetProductDetails = () => {};
+
+	const handleAddToCart = () => {};
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>
@@ -53,15 +73,15 @@ const ShoppingListing = () => {
 				</div>
 			</div>
 			<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4'>
-				{/* {productList && productList.length > 0
+				{productList && productList.length > 0
 					? productList.map((productItem) => (
 							<ShoppingProductTile
 								handleGetProductDetails={handleGetProductDetails}
 								product={productItem}
-								handleAddtoCart={handleAddtoCart}
+								handleAddToCart={handleAddToCart}
 							/>
 					  ))
-					: null} */}
+					: null}
 			</div>
 		</div>
 	);

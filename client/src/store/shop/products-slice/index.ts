@@ -25,7 +25,7 @@ const initialState: ShoppingProductsState = {
 export const fetchAllFilteredProducts = createAsyncThunk(
 	'products/fetchAllProducts',
 	async (params: { filterParams?: FilterParams; sortParams?: SortParams }) => {
-		const { filterParams = {}, sortParams } = params;
+		const { filterParams = {}, sortParams = 'newest' } = params;
 
 		// Convert filter parameters to URLSearchParams compatible format
 		const queryParams: Record<string, string> = {};
