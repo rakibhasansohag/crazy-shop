@@ -208,6 +208,7 @@ const ShoppingListing = () => {
 				openDetailsDialog={openDetailsDialog}
 				setOpenDetailsDialog={setOpenDetailsDialog}
 				productDetails={productDetails}
+				handleAddToCart={handleAddToCart}
 			/>
 		</div>
 	);
