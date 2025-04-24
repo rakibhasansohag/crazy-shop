@@ -16,6 +16,9 @@ type Props = {
 };
 
 function ProductFilter({ filters, handleFilter }: Props) {
+
+	console.log('filters in prooduct filter', filters);
+
 	return (
 		<div className='bg-background rounded-lg shadow-sm'>
 			<div className='p-4 border-b'>

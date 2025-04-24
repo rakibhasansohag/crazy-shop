@@ -49,10 +49,15 @@ app.use((req, res, next) => {
 	next();
 });
 
-// Routes
+// Routes (admin)
 app.use('/api/auth', authRouter);
 app.use('/api/admin/products', adminProductsRouter);
-app.use('/api/shop', shopProductsRouter);
+
+
+
+
+// Routes (shop)
+app.use('/api/shop/products', shopProductsRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

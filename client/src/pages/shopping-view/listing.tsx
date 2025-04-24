@@ -42,13 +42,16 @@ function createSearchParamsHelper(
 
 const ShoppingListing = () => {
 	// Search Params Realted Hook & State
+
 	const [searchParams, setSearchParams] = useSearchParams();
+	const categorySearchParam = searchParams.get('category');
 
 	// Point: to handle filter
 	const [filters, setFilters] = useState<Filters>({
 		category: [],
 		brand: [],
 	});
+
 	const handleFilter = (getSectionId: FilterKey, getCurrentOption: string) => {
 		const copyFilter = { ...filters };
 
@@ -101,12 +104,22 @@ const ShoppingListing = () => {
 	// Point:   all the use effect logic
 	useEffect(() => {
 		setSort('price-lowtohigh');
-		setFilters(
-			typeof sessionStorage.getItem('filters') === 'string'
-				? JSON.parse(sessionStorage.getItem('filters')!)
-				: {},
-		);
-	}, []);
+
+		const storedFiltersString = sessionStorage.getItem('filters');
+		let initialFilters: Filters = {};
+		if (storedFiltersString) {
+			try {
+				const parsed = JSON.parse(storedFiltersString);
+				// Check if parsed is a non-null object and not an array
+				if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+					initialFilters = parsed;
+				}
+			} catch (error) {
+				console.error('Error parsing filters from sessionStorage:', error);
+			}
+		}
+		setFilters(initialFilters);
+	}, [categorySearchParam]);
 
 	//
 	useEffect(() => {
@@ -156,17 +169,18 @@ const ShoppingListing = () => {
 						</DropdownMenu>
 					</div>
 				</div>
-			</div>
-			<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4'>
-				{productList && productList.length > 0
-					? productList.map((productItem) => (
-							<ShoppingProductTile
-								handleGetProductDetails={handleGetProductDetails}
-								product={productItem}
-								handleAddToCart={handleAddToCart}
-							/>
-					  ))
-					: null}
+
+				<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4'>
+					{productList && productList.length > 0
+						? productList.map((productItem) => (
+								<ShoppingProductTile
+									handleGetProductDetails={handleGetProductDetails}
+									product={productItem}
+									handleAddToCart={handleAddToCart}
+								/>
+						  ))
+						: null}
+				</div>
 			</div>
 		</div>
 	);
