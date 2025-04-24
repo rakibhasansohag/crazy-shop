@@ -18,11 +18,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../store/store';
 import {
 	fetchAllFilteredProducts,
+	fetchProductDetails,
 	FilterParams,
 	SortParams,
 } from '../../store/shop/products-slice';
-import ShoppingProductTile from './shopping-product-tile';
+import ShoppingProductTile from '../../components/shopping-view/shopping-product-tile';
 import { useSearchParams } from 'react-router-dom';
+import ProductDetailsDialog from '../../components/shopping-view/product-details';
 
 function createSearchParamsHelper(
 	filterParams: Record<string, string[]>,
@@ -42,9 +44,11 @@ function createSearchParamsHelper(
 
 const ShoppingListing = () => {
 	// Search Params Realted Hook & State
-
 	const [searchParams, setSearchParams] = useSearchParams();
 	const categorySearchParam = searchParams.get('category');
+
+	// Point : product details dialog related hook & state
+	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
 	// Point: to handle filter
 	const [filters, setFilters] = useState<Filters>({
@@ -82,7 +86,14 @@ const ShoppingListing = () => {
 
 	// Point: TO get and fetch shop product
 	const dispatch = useDispatch<AppDispatch>();
-	const { productList } = useSelector((state: RootState) => state.shopProducts);
+	const { productList, productDetails } = useSelector(
+		(state: RootState) => state.shopProducts,
+	);
+
+	console.log({
+		productList,
+		productDetails,
+	});
 
 	useEffect(() => {
 		if (filters !== null && sort !== null)
@@ -96,8 +107,11 @@ const ShoppingListing = () => {
 
 	console.log(productList, 'productList');
 
-	// to handle filter
-	const handleGetProductDetails = () => {};
+	// Point: TO get product details
+	function handleGetProductDetails(getCurrentProductId: string) {
+		console.log(getCurrentProductId);
+		dispatch(fetchProductDetails(getCurrentProductId));
+	}
 
 	const handleAddToCart = () => {};
 
@@ -128,6 +142,13 @@ const ShoppingListing = () => {
 			setSearchParams(new URLSearchParams(createQueryString));
 		}
 	}, [filters]);
+
+	// Point: for product details dialog
+	useEffect(() => {
+		if (productDetails) {
+			setOpenDetailsDialog(true);
+		}
+	}, [productDetails]);
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>
@@ -174,6 +195,7 @@ const ShoppingListing = () => {
 					{productList && productList.length > 0
 						? productList.map((productItem) => (
 								<ShoppingProductTile
+									key={productItem._id}
 									handleGetProductDetails={handleGetProductDetails}
 									product={productItem}
 									handleAddToCart={handleAddToCart}
@@ -182,6 +204,11 @@ const ShoppingListing = () => {
 						: null}
 				</div>
 			</div>
+			<ProductDetailsDialog
+				openDetailsDialog={openDetailsDialog}
+				setOpenDetailsDialog={setOpenDetailsDialog}
+				productDetails={productDetails}
+			/>
 		</div>
 	);
 };

@@ -14,6 +14,7 @@ export interface Product {
 	_id: string;
 	totalStock: number;
 	brand: string;
+	name?: string;
 }
 
 interface ApiResponse<T> {

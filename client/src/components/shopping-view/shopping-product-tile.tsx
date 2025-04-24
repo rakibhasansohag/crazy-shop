@@ -1,7 +1,7 @@
-import { Card, CardContent, CardFooter } from '../../components/ui/card';
+import { Card, CardContent, CardFooter } from '../ui/card';
 import { brandOptionsMap, categoryOptionsMap } from '@/config';
-import { Badge } from '../../components/ui/badge';
-import { Button } from '../../components/ui/button';
+import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { Product } from '../../store/admin/products-slice';
 
 type ShoppingProductTileProps = {
