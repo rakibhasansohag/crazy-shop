@@ -25,6 +25,12 @@ import {
 import ShoppingProductTile from '../../components/shopping-view/shopping-product-tile';
 import { useSearchParams } from 'react-router-dom';
 import ProductDetailsDialog from '../../components/shopping-view/product-details';
+import {
+	addToCart,
+	CartResponse,
+	fetchCartItems,
+} from '../../store/shop/cart-slice';
+import { toast } from 'sonner';
 
 function createSearchParamsHelper(
 	filterParams: Record<string, string[]>,
@@ -89,11 +95,8 @@ const ShoppingListing = () => {
 	const { productList, productDetails } = useSelector(
 		(state: RootState) => state.shopProducts,
 	);
-
-	console.log({
-		productList,
-		productDetails,
-	});
+	const { user } = useSelector((state: RootState) => state.auth);
+	const { cartItems } = useSelector((state: RootState) => state.shopCart);
 
 	useEffect(() => {
 		if (filters !== null && sort !== null)
@@ -105,15 +108,35 @@ const ShoppingListing = () => {
 			);
 	}, [dispatch, filters, sort]);
 
-	console.log(productList, 'productList');
-
 	// Point: TO get product details
 	function handleGetProductDetails(getCurrentProductId: string) {
 		console.log(getCurrentProductId);
 		dispatch(fetchProductDetails(getCurrentProductId));
 	}
 
-	const handleAddToCart = () => {};
+	const handleAddToCart = (getCurrentProductId: string) => {
+		if (!user?.id) {
+			toast.error('You must be logged in to add items to cart');
+			return;
+		}
+
+		dispatch(
+			addToCart({
+				userId: user?.id,
+				productId: getCurrentProductId,
+				quantity: 1,
+			}),
+		).then((data: any) => {
+			const payload = data?.payload as CartResponse;
+
+			if (payload?.success) {
+				toast.success('Product added to cart successfully');
+				dispatch(fetchCartItems({ userId: user.id }));
+			} else {
+				toast.error(payload?.message || 'Failed to add to cart');
+			}
+		});
+	};
 
 	// Point:   all the use effect logic
 	useEffect(() => {
@@ -149,6 +172,8 @@ const ShoppingListing = () => {
 			setOpenDetailsDialog(true);
 		}
 	}, [productDetails]);
+
+	console.log('shoping carts', cartItems);
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>

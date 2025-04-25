@@ -3,21 +3,37 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 export type CartItem = {
 	_id: string;
-	productId: string;
+	productId: {
+		_id: string;
+		image: string;
+		title: string;
+		price: number;
+		salePrice?: number;
+	};
 	quantity: number;
 };
 
 export type CartResponse = {
+	success: boolean;
+	message?: string;
+	data?: {
+		_id: string;
+		userId: string;
+		items: CartItem[];
+		createdAt: string;
+		updatedAt: string;
+	};
+};
+
+export type CartState = {
 	cartItems: CartItem[];
 	isLoading: boolean;
 	error?: string;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	data?: any;
 };
-
-const initialState: CartResponse = {
+const initialState: CartState = {
 	cartItems: [],
 	isLoading: false,
+	error: undefined,
 };
 
 export const addToCart = createAsyncThunk<
@@ -80,49 +96,68 @@ const shoppingCartSlice = createSlice({
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
+			// Add to Cart
 			.addCase(addToCart.pending, (state) => {
 				state.isLoading = true;
+				state.error = undefined;
 			})
 			.addCase(addToCart.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.cartItems = action.payload.data.cartItems;
+				if (action.payload.success && action.payload.data) {
+					state.cartItems = action.payload.data.items;
+				}
 			})
-			.addCase(addToCart.rejected, (state) => {
+			.addCase(addToCart.rejected, (state, action) => {
 				state.isLoading = false;
-				state.cartItems = [];
+				state.error = action.error.message || 'Something went wrong!';
 			})
+
+			// Fetch Cart Items
 			.addCase(fetchCartItems.pending, (state) => {
 				state.isLoading = true;
+				state.error = undefined;
 			})
 			.addCase(fetchCartItems.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.cartItems = action.payload.data.cartItems;
+				if (action.payload.success && action.payload.data) {
+					state.cartItems = action.payload.data.items;
+				}
 			})
-			.addCase(fetchCartItems.rejected, (state) => {
+			.addCase(fetchCartItems.rejected, (state, action) => {
 				state.isLoading = false;
-				state.cartItems = [];
+				state.error = action.error.message || 'Something went wrong!';
 			})
+
+			// Update Cart Quantity
 			.addCase(updateCartQuantity.pending, (state) => {
 				state.isLoading = true;
+				state.error = undefined;
 			})
 			.addCase(updateCartQuantity.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.cartItems = action.payload.data.cartItems;
+				if (action.payload.success && action.payload.data) {
+					state.cartItems = action.payload.data.items;
+				}
 			})
-			.addCase(updateCartQuantity.rejected, (state) => {
+			.addCase(updateCartQuantity.rejected, (state, action) => {
 				state.isLoading = false;
-				state.cartItems = [];
+				state.error = action.error.message || 'Something went wrong!';
 			})
+
+			// Delete Cart Item
 			.addCase(deleteCartItem.pending, (state) => {
 				state.isLoading = true;
+				state.error = undefined;
 			})
 			.addCase(deleteCartItem.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.cartItems = action.payload.data.cartItems;
+				if (action.payload.success && action.payload.data) {
+					state.cartItems = action.payload.data.items;
+				}
 			})
-			.addCase(deleteCartItem.rejected, (state) => {
+			.addCase(deleteCartItem.rejected, (state, action) => {
 				state.isLoading = false;
-				state.cartItems = [];
+				state.error = action.error.message || 'Something went wrong!';
 			});
 	},
 });

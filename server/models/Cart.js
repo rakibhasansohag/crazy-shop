@@ -6,6 +6,10 @@ const CartSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
 			required: true,
+			validate: {
+				validator: (v) => mongoose.isValidObjectId(v),
+				message: 'Invalid user ID format',
+			},
 		},
 		items: [
 			{

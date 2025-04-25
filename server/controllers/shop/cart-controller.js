@@ -1,3 +1,4 @@
+const { isValidObjectId } = require('mongoose');
 const Cart = require('../../models/Cart');
 const Product = require('../../models/Product');
 
@@ -21,7 +22,7 @@ const addToCart = async (req, res) => {
 			});
 		}
 
-		let cart = await cart.findOne({ userId });
+		let cart = await Cart.findOne({ userId });
 
 		if (!cart) {
 			cart = new Cart({ userId, items: [] });
@@ -55,10 +56,10 @@ const fetchCartItems = async (req, res) => {
 	try {
 		const { userId } = req.params;
 
-		if (!userId) {
+		if (!userId || !isValidObjectId(userId)) {
 			return res.status(400).json({
 				success: false,
-				message: 'User id is mandatory!',
+				message: 'Invalid user ID format',
 			});
 		}
 
