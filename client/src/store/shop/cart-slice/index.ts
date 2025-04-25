@@ -11,6 +11,8 @@ export type CartItem = {
 		salePrice?: number;
 	};
 	quantity: number;
+	price: number;
+	salePrice: number;
 };
 
 export type CartResponse = {

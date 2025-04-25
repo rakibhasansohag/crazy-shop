@@ -96,7 +96,7 @@ const ShoppingListing = () => {
 		(state: RootState) => state.shopProducts,
 	);
 	const { user } = useSelector((state: RootState) => state.auth);
-	const { cartItems } = useSelector((state: RootState) => state.shopCart);
+	
 
 	useEffect(() => {
 		if (filters !== null && sort !== null)
@@ -173,7 +173,7 @@ const ShoppingListing = () => {
 		}
 	}, [productDetails]);
 
-	console.log('shoping carts', cartItems);
+	
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>
