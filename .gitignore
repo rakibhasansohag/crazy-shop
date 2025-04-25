@@ -34,3 +34,6 @@ node_modules
 
 /client/public/cache/* 
 start-crazy-shop.ps1
+start-crazy-shop.bat
+crazy-shop.code-workspace
+

@@ -9,7 +9,7 @@ dotenv.config();
 const authRouter = require('./routes/auth/auth-routes');
 const adminProductsRouter = require('./routes/admin/products-routes');
 const shopProductsRouter = require('./routes/shop/products-routes');
-const shopCartRouter = require('./routes//shop/cart-routes-js');
+const shopCartRouter = require('./routes/shop/cart-routes.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
