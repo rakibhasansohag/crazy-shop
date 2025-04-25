@@ -23,6 +23,7 @@ import { Avatar, AvatarFallback } from '../ui/avatar';
 import { useState } from 'react';
 import { AppDispatch } from '../../store/store';
 import { toast } from 'sonner';
+import UserCartItemsContent from './cart-items-content';
 
 interface MenuItemType {
 	id: string;
@@ -77,6 +78,7 @@ function HeaderRightContent() {
 	const { user } = useSelector((state: { auth: AuthState }) => state.auth);
 
 	const [openCartSheet, setOpenCartSheet] = useState(false);
+
 	const navigate = useNavigate();
 	const dispatch = useDispatch<AppDispatch>();
 
@@ -100,6 +102,14 @@ function HeaderRightContent() {
 					</span>
 					<span className='sr-only'>User cart</span>
 				</Button>
+				<UserCartItemsContent
+				// setOpenCartSheet={setOpenCartSheet}
+				// cartItems={
+				// 	cartItems && cartItems.items && cartItems.items.length > 0
+				// 		? cartItems.items
+				// 		: []
+				// }
+				/>
 			</Sheet>
 
 			<DropdownMenu>
