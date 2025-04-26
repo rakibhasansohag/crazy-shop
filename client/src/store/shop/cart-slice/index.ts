@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 export type CartItem = {
 	_id: string;
-	productId: {
+	productId: string & {
 		_id: string;
 		image: string;
 		title: string;
@@ -13,6 +13,8 @@ export type CartItem = {
 	quantity: number;
 	price: number;
 	salePrice: number;
+	image: string;
+	title: string;
 };
 
 export type CartResponse = {
@@ -24,6 +26,8 @@ export type CartResponse = {
 		items: CartItem[];
 		createdAt: string;
 		updatedAt: string;
+		success: boolean;
+		message: string;
 	};
 };
 
