@@ -6,6 +6,9 @@ import { Dialog, DialogContent } from '../ui/dialog';
 import { Separator } from '../ui/separator';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
+import { setProductDetails } from '../../store/shop/products-slice';
 
 type ProductDetailsDialogProps = {
 	openDetailsDialog: boolean;
@@ -20,8 +23,16 @@ const ProductDetailsDialog = ({
 	productDetails,
 	handleAddToCart,
 }: ProductDetailsDialogProps) => {
+	const dispatch = useDispatch<AppDispatch>();
+
+	// close dialog from outside
+	const handleDialogClose = () => {
+		setOpenDetailsDialog(false);
+		dispatch(setProductDetails());
+	};
+
 	return (
-		<Dialog open={openDetailsDialog} onOpenChange={setOpenDetailsDialog}>
+		<Dialog open={openDetailsDialog} onOpenChange={handleDialogClose}>
 			<DialogContent className='grid grid-cols-2 gap-8 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw] '>
 				<div className='relative overflow-hidden rounded-lg bg-muted'>
 					<img

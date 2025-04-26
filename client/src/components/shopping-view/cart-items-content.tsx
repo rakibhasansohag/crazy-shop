@@ -14,8 +14,6 @@ const UserCartItemsContent = ({ cartItem }: { cartItem: CartItem }) => {
 	const { productList } = useSelector((state: RootState) => state.shopProducts);
 	const { cartItems } = useSelector((state: RootState) => state.shopCart);
 
-	console.log({ cartItem, cartItems });
-
 	const dispatch = useDispatch<AppDispatch>();
 
 	function handleUpdateQuantity(
@@ -34,8 +32,6 @@ const UserCartItemsContent = ({ cartItem }: { cartItem: CartItem }) => {
 					(product) => product._id === getCartItem?.productId,
 				);
 				const getTotalStock = productList[getCurrentProductIndex].totalStock;
-
-				console.log(getCurrentProductIndex, getTotalStock, 'getTotalStock');
 
 				if (indexOfCurrentCartItem > -1) {
 					const getQuantity = getCartItems[indexOfCurrentCartItem].quantity;
