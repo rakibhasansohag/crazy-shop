@@ -89,6 +89,7 @@ const ProductDetailsDialog = ({
 							<Button
 								className='w-full'
 								onClick={() =>
+									// /TODO : need to update the hanlde cart error handling if the stock is finished added an error message
 									handleAddToCart(
 										productDetails?._id as string,
 										productDetails?.totalStock as number,

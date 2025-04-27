@@ -3,7 +3,7 @@ const { default: mongoose } = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const path = require('path'); 
+
 dotenv.config();
 
 const authRouter = require('./routes/auth/auth-routes');
