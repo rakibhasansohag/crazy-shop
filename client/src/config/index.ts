@@ -11,6 +11,7 @@ import {
 	WashingMachine,
 	WatchIcon,
 } from 'lucide-react';
+import { FormControls } from '../components/common/form';
 
 export const registerFormControls = [
 	{
@@ -200,7 +201,7 @@ export const sortOptions = [
 	{ id: 'title-ztoa', label: 'Title: Z to A' },
 ];
 
-export const addressFormControls = [
+export const addressFormControls: FormControls[] = [
 	{
 		label: 'Address',
 		name: 'address',

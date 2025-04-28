@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 export interface AddressItem {
@@ -19,62 +19,82 @@ interface AddressState {
 	addressList: AddressItem[];
 }
 
+interface AddressResponse {
+	success: boolean;
+	message?: string;
+	data?: AddressItem | AddressItem[];
+}
+
+interface DeleteResponse {
+	success: boolean;
+	addressId: string;
+}
+
 const initialState: AddressState = {
 	isLoading: false,
 	addressList: [],
 };
 
-export const addNewAddress = createAsyncThunk(
-	'/addresses/addNewAddress',
-	async (formData: Partial<AddressItem>) => {
-		const response = await axios.post(
-			'http://localhost:5000/api/shop/address/add',
-			formData,
-		);
-		return response.data;
-	},
-);
+export const addNewAddress = createAsyncThunk<
+	AddressResponse,
+	{
+		userId: string;
+		address: string;
+		city: string;
+		phone: string;
+		pincode: string;
+		notes: string;
+	}
+>('/addresses/addNewAddress', async (payload) => {
+	const response = await axios.post(
+		'http://localhost:4000/api/shop/address/add',
+		payload,
+	);
+	return response.data;
+});
 
-export const fetchAllAddresses = createAsyncThunk(
+export const fetchAllAddresses = createAsyncThunk<AddressResponse, string>(
 	'/addresses/fetchAllAddresses',
-	async (userId: string) => {
-		const response = await axios.get(
-			`http://localhost:5000/api/shop/address/get/${userId}`,
+	async (userId) => {
+		const response = await axios.get<AddressResponse>(
+			`http://localhost:4000/api/shop/address/get/${userId}`,
 		);
 		return response.data;
 	},
 );
 
-export const editAddress = createAsyncThunk(
-	'/addresses/editAddress',
-	async ({
-		userId,
-		addressId,
-		formData,
-	}: {
+export const editAddress = createAsyncThunk<
+	AddressResponse,
+	{
 		userId: string;
 		addressId: string;
-		formData: Partial<AddressItem>;
-	}) => {
-		const response = await axios.put(
-			`http://localhost:5000/api/shop/address/update/${userId}/${addressId}`,
-			formData,
-		);
-		return response.data;
-	},
-);
+		formData: {
+			address: string;
+			city: string;
+			phone: string;
+			pincode: string;
+			notes: string;
+		};
+	}
+>('/addresses/editAddress', async (payload) => {
+	const response = await axios.put(
+		`http://localhost:4000/api/shop/address/update/${payload.userId}/${payload.addressId}`,
+		payload.formData,
+	);
 
-export const deleteAddress = createAsyncThunk(
-	'/addresses/deleteAddress',
-	async ({ userId, addressId }: { userId: string; addressId: string }) => {
-		const response = await axios.delete(
-			`http://localhost:5000/api/shop/address/delete/${userId}/${addressId}`,
-		);
-		return { ...response.data, addressId };
-	},
-);
+	return response.data;
+});
 
-// Slices
+export const deleteAddress = createAsyncThunk<
+	DeleteResponse,
+	{ userId: string; addressId: string }
+>('/addresses/deleteAddress', async ({ userId, addressId }) => {
+	const response = await axios.delete<{ success: boolean }>(
+		`http://localhost:4000/api/shop/address/delete/${userId}/${addressId}`,
+	);
+	return { ...response.data, addressId };
+});
+
 const addressSlice = createSlice({
 	name: 'address',
 	initialState,
@@ -84,22 +104,33 @@ const addressSlice = createSlice({
 			.addCase(addNewAddress.pending, (state) => {
 				state.isLoading = true;
 			})
-			.addCase(addNewAddress.fulfilled, (state, action) => {
-				state.isLoading = false;
-				if (action.payload.success && action.payload.data) {
-					state.addressList.push(action.payload.data);
-				}
-			})
+			.addCase(
+				addNewAddress.fulfilled,
+				(state, action: PayloadAction<AddressResponse>) => {
+					state.isLoading = false;
+					if (action.payload.success && action.payload.data) {
+						const newAddress = Array.isArray(action.payload.data)
+							? action.payload.data[0]
+							: action.payload.data;
+						state.addressList.push(newAddress);
+					}
+				},
+			)
 			.addCase(addNewAddress.rejected, (state) => {
 				state.isLoading = false;
 			})
 			.addCase(fetchAllAddresses.pending, (state) => {
 				state.isLoading = true;
 			})
-			.addCase(fetchAllAddresses.fulfilled, (state, action) => {
-				state.isLoading = false;
-				state.addressList = action.payload.data || [];
-			})
+			.addCase(
+				fetchAllAddresses.fulfilled,
+				(state, action: PayloadAction<AddressResponse>) => {
+					state.isLoading = false;
+					state.addressList = Array.isArray(action.payload.data)
+						? action.payload.data
+						: [];
+				},
+			)
 			.addCase(fetchAllAddresses.rejected, (state) => {
 				state.isLoading = false;
 				state.addressList = [];
@@ -107,33 +138,40 @@ const addressSlice = createSlice({
 			.addCase(editAddress.pending, (state) => {
 				state.isLoading = true;
 			})
-			.addCase(editAddress.fulfilled, (state, action) => {
-				state.isLoading = false;
-				if (action.payload.success && action.payload.data) {
-					const updatedAddress = action.payload.data;
-					const index = state.addressList.findIndex(
-						(item) => item._id === updatedAddress._id,
-					);
-					if (index !== -1) {
-						state.addressList[index] = updatedAddress;
+			.addCase(
+				editAddress.fulfilled,
+				(state, action: PayloadAction<AddressResponse>) => {
+					state.isLoading = false;
+					if (action.payload.success && action.payload.data) {
+						const updatedAddress = Array.isArray(action.payload.data)
+							? action.payload.data[0]
+							: action.payload.data;
+						const index = state.addressList.findIndex(
+							(item) => item._id === updatedAddress._id,
+						);
+						if (index !== -1) {
+							state.addressList[index] = updatedAddress;
+						}
 					}
-				}
-			})
+				},
+			)
 			.addCase(editAddress.rejected, (state) => {
 				state.isLoading = false;
 			})
 			.addCase(deleteAddress.pending, (state) => {
 				state.isLoading = true;
 			})
-			.addCase(deleteAddress.fulfilled, (state, action) => {
-				state.isLoading = false;
-				if (action.payload.success) {
-					const deletedId = action.payload.addressId;
-					state.addressList = state.addressList.filter(
-						(item) => item._id !== deletedId,
-					);
-				}
-			})
+			.addCase(
+				deleteAddress.fulfilled,
+				(state, action: PayloadAction<DeleteResponse>) => {
+					state.isLoading = false;
+					if (action.payload.success) {
+						state.addressList = state.addressList.filter(
+							(item) => item._id !== action.payload.addressId,
+						);
+					}
+				},
+			)
 			.addCase(deleteAddress.rejected, (state) => {
 				state.isLoading = false;
 			});

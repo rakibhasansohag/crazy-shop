@@ -1,5 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import accImg from '../../assets/account.jpg';
+import Address from '../../components/shopping-view/address';
+import { AddressItem } from '../../store/shop/address-slice';
 
 const ShoppingAccount = () => {
 	return (
@@ -18,7 +20,14 @@ const ShoppingAccount = () => {
 							<TabsTrigger value='address'>Address</TabsTrigger>
 						</TabsList>
 						<TabsContent value='orders'>Shoping orders</TabsContent>
-						<TabsContent value='address'>address</TabsContent>
+						<TabsContent value='address'>
+							<Address
+								selectedId={null}
+								setCurrentSelectedAddress={(address: AddressItem) => {
+									console.log('clicked', address);
+								}}
+							/>
+						</TabsContent>
 					</Tabs>
 				</div>
 			</div>

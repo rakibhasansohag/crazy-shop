@@ -1,136 +1,148 @@
+const { isValidObjectId } = require('mongoose');
+
 const Address = require('../../models/Address');
+
+const errorResponse = (res, status, message) => {
+	return res.status(status).json({
+		success: false,
+		message,
+	});
+};
 
 const addAddress = async (req, res) => {
 	try {
-		const { userId, address, city, pincode, phone, notes } = req.body;
+		const { userId, address, city, pincode, phone, notes = '' } = req.body;
 
-		if (!userId || !address || !city || !pincode || !phone || !notes) {
-			return res.status(400).json({
-				success: false,
-				message: 'Invalid data provided!',
-			});
+		// Validate required fields
+		const requiredFields = { userId, address, city, pincode, phone };
+		const missingFields = Object.entries(requiredFields)
+			.filter(([_, value]) => !value)
+			.map(([key]) => key);
+
+		if (missingFields.length > 0) {
+			return errorResponse(
+				res,
+				400,
+				`Missing required fields: ${missingFields.join(', ')}`,
+			);
 		}
 
-		const newlyCreatedAddress = new Address({
+		// Validate ObjectID format
+		if (!isValidObjectId(userId)) {
+			return errorResponse(res, 400, 'Invalid user ID format');
+		}
+
+		const newAddress = await Address.create({
 			userId,
 			address,
 			city,
 			pincode,
-			notes,
 			phone,
+			notes,
 		});
-
-		await newlyCreatedAddress.save();
 
 		res.status(201).json({
 			success: true,
-			data: newlyCreatedAddress,
+			data: newAddress,
 		});
-	} catch (e) {
-		console.log(e);
-		res.status(500).json({
-			success: false,
-			message: 'Error',
-		});
+	} catch (error) {
+		console.error('Add address error:', error);
+		errorResponse(res, 500, 'Failed to create address');
 	}
 };
 
 const fetchAllAddress = async (req, res) => {
 	try {
 		const { userId } = req.params;
-		if (!userId) {
-			return res.status(400).json({
-				success: false,
-				message: 'User id is required!',
-			});
+
+		if (!userId || !isValidObjectId(userId)) {
+			return errorResponse(res, 400, 'Valid user ID is required');
 		}
 
-		const addressList = await Address.find({ userId });
+		const addresses = await Address.find({ userId })
+			.sort({ createdAt: -1 })
+			.lean();
 
 		res.status(200).json({
 			success: true,
-			data: addressList,
+			data: addresses,
 		});
-	} catch (e) {
-		console.log(e);
-		res.status(500).json({
-			success: false,
-			message: 'Error',
-		});
+	} catch (error) {
+		console.error('Fetch addresses error:', error);
+		errorResponse(res, 500, 'Failed to fetch addresses');
 	}
 };
 
 const editAddress = async (req, res) => {
 	try {
 		const { userId, addressId } = req.params;
-		const formData = req.body;
+		const updates = req.body;
 
-		if (!userId || !addressId) {
-			return res.status(400).json({
-				success: false,
-				message: 'User and address id is required!',
-			});
+		// Validate IDs
+		if (!isValidObjectId(userId) || !isValidObjectId(addressId)) {
+			return errorResponse(res, 400, 'Invalid ID format');
 		}
 
-		const address = await Address.findOneAndUpdate(
-			{
-				_id: addressId,
-				userId,
-			},
-			formData,
-			{ new: true },
+		// Validate allowed updates
+		const allowedUpdates = ['address', 'city', 'pincode', 'phone', 'notes'];
+		const isValidUpdate = Object.keys(updates).every((key) =>
+			allowedUpdates.includes(key),
 		);
 
-		if (!address) {
-			return res.status(404).json({
-				success: false,
-				message: 'Address not found',
-			});
+		if (!isValidUpdate) {
+			return errorResponse(res, 400, 'Invalid updates!');
+		}
+
+		const updatedAddress = await Address.findOneAndUpdate(
+			{ _id: addressId, userId },
+			updates,
+			{ new: true, runValidators: true },
+		);
+
+		if (!updatedAddress) {
+			return errorResponse(res, 404, 'Address not found');
 		}
 
 		res.status(200).json({
 			success: true,
-			data: address,
+			data: updatedAddress,
 		});
-	} catch (e) {
-		console.log(e);
-		res.status(500).json({
-			success: false,
-			message: 'Error',
-		});
+	} catch (error) {
+		console.error('Edit address error:', error);
+		errorResponse(res, 500, 'Failed to update address');
 	}
 };
 
 const deleteAddress = async (req, res) => {
 	try {
 		const { userId, addressId } = req.params;
-		if (!userId || !addressId) {
-			return res.status(400).json({
-				success: false,
-				message: 'User and address id is required!',
-			});
+
+		if (!isValidObjectId(userId) || !isValidObjectId(addressId)) {
+			return errorResponse(res, 400, 'Invalid ID format');
 		}
 
-		const address = await Address.findOneAndDelete({ _id: addressId, userId });
+		const deletedAddress = await Address.findOneAndDelete({
+			_id: addressId,
+			userId,
+		});
 
-		if (!address) {
-			return res.status(404).json({
-				success: false,
-				message: 'Address not found',
-			});
+		if (!deletedAddress) {
+			return errorResponse(res, 404, 'Address not found');
 		}
 
 		res.status(200).json({
 			success: true,
 			message: 'Address deleted successfully',
 		});
-	} catch (e) {
-		console.log(e);
-		res.status(500).json({
-			success: false,
-			message: 'Error',
-		});
+	} catch (error) {
+		console.error('Delete address error:', error);
+		errorResponse(res, 500, 'Failed to delete address');
 	}
 };
 
-module.exports = { addAddress, editAddress, fetchAllAddress, deleteAddress };
+module.exports = {
+	addAddress,
+	editAddress,
+	fetchAllAddress,
+	deleteAddress,
+};

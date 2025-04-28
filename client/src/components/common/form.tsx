@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, JSX } from 'react';
+import { InputHTMLAttributes, JSX, Dispatch, SetStateAction } from 'react';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import {
@@ -11,133 +11,107 @@ import {
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 
-interface FormControls {
+export interface FormControls {
 	name: string;
 	label: string;
 	placeholder?: string;
-	componentType: string;
+	componentType: 'input' | 'select' | 'textarea';
 	type?: InputHTMLAttributes<HTMLInputElement>['type'];
 	id?: string;
 	options?: { id: string; label: string }[];
 }
 
-interface CommonFormProps<
-	T extends Record<string, string> = Record<string, string>,
-> {
+export interface CommonFormProps<T> {
 	formControls: FormControls[];
 	formData: T;
-	setFormData: (formData: T) => void;
+	// use the React setter type
+	setFormData: Dispatch<SetStateAction<T>>;
 	onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 	buttonText?: string;
 	isBtnDisabled?: boolean;
 }
 
-function CommonForm({
+export default function CommonForm<T>({
 	formControls,
 	formData,
 	setFormData,
 	onSubmit,
 	buttonText,
 	isBtnDisabled,
-}: CommonFormProps) {
-	// Point: Render inputs by component type
-	function renderInputsByComponentType(getControlItem: FormControls) {
-		let element: JSX.Element | null = null;
-		const value = formData[getControlItem.name] || '';
+}: CommonFormProps<T>) {
+	const renderInputsByComponentType = (ctrl: FormControls): JSX.Element => {
+		// cast so TS lets us index into T
+		const key = ctrl.name as keyof T;
+		const value = (formData[key] ?? '') as unknown as string;
 
-		switch (getControlItem.componentType) {
+		const update = (newVal: string) => {
+			setFormData({
+				...formData,
+				[ctrl.name]: newVal,
+			} as unknown as T);
+		};
+
+		switch (ctrl.componentType) {
 			case 'input':
-				element = (
+				return (
 					<Input
-						name={getControlItem.name}
-						placeholder={getControlItem.placeholder}
-						id={getControlItem.name}
-						type={getControlItem.type}
+						name={ctrl.name}
+						placeholder={ctrl.placeholder}
+						id={ctrl.name}
+						type={ctrl.type}
 						value={value}
-						onChange={(event) =>
-							setFormData({
-								...formData,
-								[getControlItem.name]: event.target.value,
-							})
-						}
+						onChange={(e) => update(e.target.value)}
 					/>
 				);
 
-				break;
 			case 'select':
-				element = (
-					<Select
-						onValueChange={(value) =>
-							setFormData({
-								...formData,
-								[getControlItem.name]: value,
-							})
-						}
-						value={value}
-					>
+				return (
+					<Select value={value} onValueChange={(v) => update(v)}>
 						<SelectTrigger className='w-full'>
-							<SelectValue placeholder={getControlItem.label} />
+							<SelectValue placeholder={ctrl.label} />
 						</SelectTrigger>
 						<SelectContent>
-							{getControlItem.options && getControlItem.options.length > 0
-								? getControlItem.options.map((optionItem) => (
-										<SelectItem key={optionItem.id} value={optionItem.id}>
-											{optionItem.label}
-										</SelectItem>
-								  ))
-								: null}
+							{ctrl.options?.map((opt) => (
+								<SelectItem key={opt.id} value={opt.id}>
+									{opt.label}
+								</SelectItem>
+							))}
 						</SelectContent>
 					</Select>
 				);
 
-				break;
 			case 'textarea':
-				element = (
+				return (
 					<Textarea
-						name={getControlItem.name}
-						placeholder={getControlItem.placeholder}
-						id={getControlItem.id}
+						name={ctrl.name}
+						placeholder={ctrl.placeholder}
+						id={ctrl.id}
 						value={value}
-						onChange={(event) =>
-							setFormData({
-								...formData,
-								[getControlItem.name]: event.target.value,
-							})
-						}
+						onChange={(e) => update(e.target.value)}
 					/>
 				);
-
-				break;
 
 			default:
-				element = (
+				return (
 					<Input
-						name={getControlItem.name}
-						placeholder={getControlItem.placeholder}
-						id={getControlItem.name}
-						type={getControlItem.type}
+						name={ctrl.name}
+						placeholder={ctrl.placeholder}
+						id={ctrl.name}
+						type={ctrl.type}
 						value={value}
-						onChange={(event) =>
-							setFormData({
-								...formData,
-								[getControlItem.name]: event.target.value,
-							})
-						}
+						onChange={(e) => update(e.target.value)}
 					/>
 				);
-				break;
 		}
-
-		return element;
-	}
+	};
 
 	return (
 		<form onSubmit={onSubmit}>
 			<div className='flex flex-col gap-5'>
-				{formControls.map((controlItem) => (
-					<div className='grid w-full gap-1.5' key={controlItem.name}>
-						<Label className='mb-1'>{controlItem.label}</Label>
-						{renderInputsByComponentType(controlItem)}
+				{formControls.map((ctrl) => (
+					<div className='grid w-full gap-1.5' key={ctrl.name}>
+						<Label className='mb-1'>{ctrl.label}</Label>
+						{renderInputsByComponentType(ctrl)}
 					</div>
 				))}
 			</div>
@@ -151,5 +125,3 @@ function CommonForm({
 		</form>
 	);
 }
-
-export default CommonForm;
