@@ -17,12 +17,12 @@ import { AppDispatch, RootState } from '@/store/store';
 import { toast } from 'sonner';
 import AddressCard from './address-cart';
 
-interface AddressProps {
+export interface AddressProps {
 	setCurrentSelectedAddress: (address: AddressItem) => void;
 	selectedId: AddressItem | null;
 }
 
-interface AddressFormData {
+export interface AddressFormData {
 	address: string;
 	city: string;
 	phone: string;
@@ -90,7 +90,7 @@ const Address = ({ setCurrentSelectedAddress, selectedId }: AddressProps) => {
 				})
 				.catch((error) => {
 					console.log('Address update error', error);
-					toast.error('Update failed');
+					toast.error(`Edit failed with error: ${error || 'unknown'}`);
 				});
 		} else {
 			dispatch(
@@ -112,7 +112,7 @@ const Address = ({ setCurrentSelectedAddress, selectedId }: AddressProps) => {
 				})
 				.catch((error) => {
 					console.log('Address add error:', error);
-					toast.error('Add failed');
+					toast.error(`Add failed with error: ${error || "unknown"}`);
 				});
 		}
 	};

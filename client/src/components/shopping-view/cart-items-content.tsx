@@ -31,7 +31,7 @@ const UserCartItemsContent = ({ cartItem }: { cartItem: CartItem }) => {
 				const getCurrentProductIndex = productList.findIndex(
 					(product) => product._id === getCartItem?.productId,
 				);
-				const getTotalStock = productList[getCurrentProductIndex].totalStock;
+				const getTotalStock = productList[getCurrentProductIndex]?.totalStock;
 
 				if (indexOfCurrentCartItem > -1) {
 					const getQuantity = getCartItems[indexOfCurrentCartItem].quantity;

@@ -1,5 +1,63 @@
+import { useDispatch, useSelector } from 'react-redux';
+import Address from '../../components/shopping-view/address';
+import UserCartItemsContent from '../../components/shopping-view/cart-items-content';
+import img from '../../assets/account.jpg';
+
+import { AppDispatch, RootState } from '../../store/store';
+import { useState } from 'react';
+import { AddressItem } from '../../store/shop/address-slice';
+
+export interface ShoppingCheckoutProps {
+	setCurrentSelectedAddress: (address: AddressItem) => void;
+	selectedId: AddressItem | null;
+}
+
 const ShoppingCheckout = () => {
-	return <div>ShoppingCheckout</div>;
+	const [currentSelectedAddress, setCurrentSelectedAddress] =
+		useState<AddressItem | null>(null);
+
+	const { cartItems } = useSelector((state: RootState) => state.shopCart);
+	const { user } = useSelector((state: RootState) => state.auth);
+
+	const dispatch = useDispatch<AppDispatch>();
+
+	const totalCartAmount =
+		cartItems && cartItems && cartItems.length > 0
+			? cartItems.reduce(
+					(sum, currentItem) =>
+						sum +
+						(currentItem?.salePrice > 0
+							? currentItem?.salePrice
+							: currentItem?.price) *
+							currentItem?.quantity,
+					0,
+			  )
+			: 0;
+
+	return (
+		<div className='flex flex-col'>
+			<div className='relative h-[300px] w-full overflow-hidden'>
+				<img src={img} className='h-full w-full object-cover object-center' />
+			</div>
+			<div className='grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5 p-5'>
+				<Address
+					selectedId={currentSelectedAddress}
+					setCurrentSelectedAddress={setCurrentSelectedAddress}
+				/>
+				<div className='flex flex-col gap-4'>
+					{cartItems && cartItems && cartItems.length > 0
+						? cartItems.map((item) => <UserCartItemsContent cartItem={item} />)
+						: null}
+					<div className='mt-8 space-y-4'>
+						<div className='flex justify-between'>
+							<span className='font-bold'>Total</span>
+							<span className='font-bold'>${totalCartAmount}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default ShoppingCheckout;
