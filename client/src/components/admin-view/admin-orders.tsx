@@ -1,4 +1,8 @@
+import { useState } from 'react';
+import AdminOrderDetailsView from '../../pages/admin-view/Admin-order-details';
+import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Dialog } from '../ui/dialog';
 import {
 	Table,
 	TableBody,
@@ -8,7 +12,9 @@ import {
 	TableRow,
 } from '../ui/table';
 
-const AdminOrders = () => {
+const AdminOrdersView = () => {
+	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+
 	return (
 		<Card>
 			<CardHeader>
@@ -33,7 +39,23 @@ const AdminOrders = () => {
 							<TableCell>4256534</TableCell>
 							<TableCell>42654634</TableCell>
 							<TableCell>586</TableCell>
-							<TableCell>fdf</TableCell>
+							<TableCell>
+								<Dialog
+									open={openDetailsDialog}
+									onOpenChange={() => {
+										setOpenDetailsDialog(false);
+									}}
+								>
+									<Button
+										onClick={() => {
+											setOpenDetailsDialog(true);
+										}}
+									>
+										View Details
+									</Button>
+									<AdminOrderDetailsView />
+								</Dialog>
+							</TableCell>
 						</TableRow>
 					</TableBody>
 				</Table>
@@ -42,4 +64,4 @@ const AdminOrders = () => {
 	);
 };
 
-export default AdminOrders;
+export default AdminOrdersView;
