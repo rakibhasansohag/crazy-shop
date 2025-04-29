@@ -6,6 +6,7 @@ import img from '../../assets/account.jpg';
 import { AppDispatch, RootState } from '../../store/store';
 import { useState } from 'react';
 import { AddressItem } from '../../store/shop/address-slice';
+import { Button } from '../../components/ui/button';
 
 export interface ShoppingCheckoutProps {
 	setCurrentSelectedAddress: (address: AddressItem) => void;
@@ -15,6 +16,8 @@ export interface ShoppingCheckoutProps {
 const ShoppingCheckout = () => {
 	const [currentSelectedAddress, setCurrentSelectedAddress] =
 		useState<AddressItem | null>(null);
+
+	const [isPaymentStart, setIsPaymemntStart] = useState(false);
 
 	const { cartItems } = useSelector((state: RootState) => state.shopCart);
 	const { user } = useSelector((state: RootState) => state.auth);
@@ -33,6 +36,8 @@ const ShoppingCheckout = () => {
 					0,
 			  )
 			: 0;
+
+	const handleInitiatePaypalPayment = () => {};
 
 	return (
 		<div className='flex flex-col'>
@@ -53,6 +58,13 @@ const ShoppingCheckout = () => {
 							<span className='font-bold'>Total</span>
 							<span className='font-bold'>${totalCartAmount}</span>
 						</div>
+					</div>
+					<div className='mt-4 w-full'>
+						<Button onClick={handleInitiatePaypalPayment} className='w-full'>
+							{isPaymentStart
+								? 'Processing Paypal Payment...'
+								: 'Checkout with Paypal'}
+						</Button>
 					</div>
 				</div>
 			</div>
