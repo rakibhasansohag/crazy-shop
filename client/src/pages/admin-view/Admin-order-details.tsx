@@ -4,9 +4,23 @@ import { Label } from '../../components/ui/label';
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import { RootState } from '../../store/store';
+import CommonForm from '../../components/common/form';
+import { useState } from 'react';
+
+type FormData = {
+	status: string;
+};
+
+const initialFormData: FormData = {
+	status: '',
+};
 
 function AdminOrderDetailsView() {
+	const [formData, setFormData] = useState(initialFormData);
+
 	const { user } = useSelector((state: RootState) => state.auth);
+
+	const handleUpdateStatus = () => {};
 
 	const orderDetails = {
 		_id: '1234567890',
@@ -106,6 +120,28 @@ function AdminOrderDetailsView() {
 							<span>{orderDetails?.addressInfo?.notes}</span>
 						</div>
 					</div>
+				</div>
+				<div>
+					<CommonForm
+						formControls={[
+							{
+								label: 'Order Status',
+								name: 'status',
+								componentType: 'select',
+								options: [
+									{ id: 'pending', label: 'Pending' },
+									{ id: 'inProcess', label: 'In Process' },
+									{ id: 'inShipping', label: 'In Shipping' },
+									{ id: 'delivered', label: 'Delivered' },
+									{ id: 'rejected', label: 'Rejected' },
+								],
+							},
+						]}
+						formData={formData}
+						setFormData={setFormData}
+						buttonText={'Update Order Status'}
+						onSubmit={handleUpdateStatus}
+					/>
 				</div>
 			</div>
 		</DialogContent>
