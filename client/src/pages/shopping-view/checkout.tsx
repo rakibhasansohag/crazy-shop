@@ -17,12 +17,18 @@ const ShoppingCheckout = () => {
 	const [currentSelectedAddress, setCurrentSelectedAddress] =
 		useState<AddressItem | null>(null);
 
-	const [isPaymentStart, setIsPaymemntStart] = useState(false);
+	const [isPaymentStart, setIsPaymentStart] = useState(false);
 
 	const { cartItems } = useSelector((state: RootState) => state.shopCart);
 	const { user } = useSelector((state: RootState) => state.auth);
 
 	const dispatch = useDispatch<AppDispatch>();
+
+	console.log({
+		setIsPaymentStart,
+		user,
+		dispatch,
+	});
 
 	const totalCartAmount =
 		cartItems && cartItems && cartItems.length > 0

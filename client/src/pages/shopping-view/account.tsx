@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import accImg from '../../assets/account.jpg';
 import Address from '../../components/shopping-view/address';
 import { AddressItem } from '../../store/shop/address-slice';
+import ShoppingOrders from '../../components/shopping-view/shopping-orders';
 
 const ShoppingAccount = () => {
 	return (
@@ -19,7 +20,9 @@ const ShoppingAccount = () => {
 							<TabsTrigger value='orders'>Orders</TabsTrigger>
 							<TabsTrigger value='address'>Address</TabsTrigger>
 						</TabsList>
-						<TabsContent value='orders'>Shoping orders</TabsContent>
+						<TabsContent value='orders'>
+							<ShoppingOrders />
+						</TabsContent>
 						<TabsContent value='address'>
 							<Address
 								selectedId={null}
