@@ -4,9 +4,13 @@ import { DialogContent } from '../ui/dialog';
 import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
 import { RootState } from '../../store/store';
-import { orderDetails } from '../../pages/admin-view/Admin-order-details';
+import { Order } from '../../types/order';
 
-function ShoppingOrderDetailsView() {
+type OrderDetailsProps = {
+	orderDetails: Order;
+};
+
+function ShoppingOrderDetailsView({ orderDetails }: OrderDetailsProps) {
 	const { user } = useSelector((state: RootState) => state.auth);
 
 	return (
@@ -19,7 +23,9 @@ function ShoppingOrderDetailsView() {
 					</div>
 					<div className='flex mt-2 items-center justify-between'>
 						<p className='font-medium'>Order Date</p>
-						<Label>{orderDetails?.orderDate.split('T')[0]}</Label>
+						<Label>
+							{new Date(orderDetails?.orderDate).toISOString().split('T')[0]}
+						</Label>
 					</div>
 					<div className='flex mt-2 items-center justify-between'>
 						<p className='font-medium'>Order Price</p>

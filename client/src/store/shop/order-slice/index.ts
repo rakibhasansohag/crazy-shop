@@ -1,84 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { Product } from '../../admin/products-slice';
-import { AddressItem } from '../address-slice';
-import { CartItem } from '../cart-slice';
+import { CreateOrderPayload, Order, OrderListItem } from '../../../types/order';
 
-export type OrderData = {
-	approvalURL: string | null;
-	orderId: string | null;
-};
-
-export type OrderDataCreate = {
-	userId: string;
-	cartId: string;
-	cartItems: CartItem[];
-	addressInfo: {
-		addressId: string;
-		address: string;
-		city: string;
-		pincode: string;
-		phone: string;
-		notes?: string;
-	};
-	orderStatus: 'pending' | 'confirmed' | 'shipped' | 'delivered';
-	paymentMethod: 'paypal' | 'stripe' | 'cash';
-	paymentStatus: 'pending' | 'paid' | 'failed';
-	totalAmount: number;
-	orderDate: Date;
-	orderUpdateDate: Date;
-	paymentId?: string;
-	payerId?: string;
-};
-
-export type OrderDetails = {
-	id: string | null;
-	items: Product[];
-	total: number;
-};
-
-export type OrderListItem = {
-	id: string;
-	date: string;
-	total: number;
-};
-
-export type OrderState = {
+type OrderState = {
 	approvalURL: string | null;
 	isLoading: boolean;
 	orderId: string | null;
 	orderList: OrderListItem[];
-	orderDetails: OrderDetails | null;
-};
-
-export type AddressInfo = {
-	addressId: string;
-	address: string;
-	city: string;
-	pincode: string;
-	phone: string;
-	notes: string;
-};
-
-export type CreateOrderPayload = {
-	userId: string;
-	cartId: string;
-	cartItems: {
-		productId: string;
-		title: string;
-		image: string;
-		price: number;
-		quantity: number;
-	}[];
-	addressInfo: AddressItem;
-	orderStatus: string;
-	paymentMethod: string;
-	paymentStatus: string;
-	totalAmount: number;
-	orderDate: Date;
-	orderUpdateDate: Date;
-	paymentId: string;
-	payerId: string;
+	orderDetails: Order | null;
 };
 
 const initialState: OrderState = {
@@ -90,17 +19,13 @@ const initialState: OrderState = {
 };
 
 export const createNewOrder = createAsyncThunk<
-	{
-		approvalURL: string;
-		orderId: string;
-	},
+	{ approvalURL: string; orderId: string },
 	CreateOrderPayload
 >('/order/createNewOrder', async (orderData) => {
 	const response = await axios.post<{ approvalURL: string; orderId: string }>(
 		'http://localhost:4000/api/shop/order/create',
 		orderData,
 	);
-
 	return response.data;
 });
 
@@ -110,34 +35,27 @@ export const capturePayment = createAsyncThunk<
 >('/order/capturePayment', async ({ paymentId, payerId, orderId }) => {
 	const response = await axios.post(
 		'http://localhost:4000/api/shop/order/capture',
-		{
-			paymentId,
-			payerId,
-			orderId,
-		},
+		{ paymentId, payerId, orderId },
 	);
-
 	return response.data;
 });
 
-export const getAllOrdersByUserId = createAsyncThunk(
-	'/order/getAllOrdersByUserId',
-	async (userId) => {
-		const response = await axios.get(
-			`http://localhost:4000/api/shop/order/list/${userId}`,
-		);
+export const getAllOrdersByUserId = createAsyncThunk<
+	{ data: OrderListItem[] },
+	string
+>('/order/getAllOrdersByUserId', async (userId) => {
+	const response = await axios.get(
+		`http://localhost:4000/api/shop/order/list/${userId}`,
+	);
+	return response.data;
+});
 
-		return response.data;
-	},
-);
-
-export const getOrderDetails = createAsyncThunk(
+export const getOrderDetails = createAsyncThunk<{ data: Order }, string>(
 	'/order/getOrderDetails',
 	async (id) => {
 		const response = await axios.get(
 			`http://localhost:4000/api/shop/order/details/${id}`,
 		);
-
 		return response.data;
 	},
 );
@@ -195,5 +113,4 @@ const shoppingOrderSlice = createSlice({
 });
 
 export const { resetOrderDetails } = shoppingOrderSlice.actions;
-
 export default shoppingOrderSlice.reducer;

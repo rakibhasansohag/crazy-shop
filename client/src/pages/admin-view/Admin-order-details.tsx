@@ -6,6 +6,7 @@ import { Separator } from '../../components/ui/separator';
 import { RootState } from '../../store/store';
 import CommonForm from '../../components/common/form';
 import { useState } from 'react';
+import { Order } from '../../types/order';
 
 type FormData = {
 	status: string;
@@ -15,35 +16,11 @@ const initialFormData: FormData = {
 	status: '',
 };
 
-export const orderDetails = {
-	_id: '1234567890',
-	orderDate: '2022-11-24T14:30:00.000Z',
-	totalAmount: 1000,
-	paymentMethod: 'card',
-	paymentStatus: 'pending',
-	orderStatus: 'confirmed',
-	cartItems: [
-		{
-			title: 'Product 1',
-			quantity: 2,
-			price: 500,
-		},
-		{
-			title: 'Product 2',
-			quantity: 1,
-			price: 300,
-		},
-	],
-	addressInfo: {
-		address: '123 Main St',
-		city: 'New York',
-		pincode: '10001',
-		phone: '1234567890',
-		notes: 'This is a test order',
-	},
+export type OrderDataCreateProps = {
+	orderDetails: Order;
 };
 
-function AdminOrderDetailsView() {
+function AdminOrderDetailsView({ orderDetails }: OrderDataCreateProps) {
 	const [formData, setFormData] = useState(initialFormData);
 
 	const { user } = useSelector((state: RootState) => state.auth);
@@ -60,7 +37,9 @@ function AdminOrderDetailsView() {
 					</div>
 					<div className='flex mt-2 items-center justify-between'>
 						<p className='font-medium'>Order Date</p>
-						<Label>{orderDetails?.orderDate.split('T')[0]}</Label>
+						<Label>
+							{new Date(orderDetails?.orderDate).toISOString().split('T')[0]}
+						</Label>
 					</div>
 					<div className='flex mt-2 items-center justify-between'>
 						<p className='font-medium'>Order Price</p>
