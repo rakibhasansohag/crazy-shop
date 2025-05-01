@@ -54,3 +54,11 @@ export type CreateOrderPayload = Omit<
 	Order,
 	'_id' | 'orderUpdateDate' | 'paymentId' | 'payerId'
 >;
+
+
+// FOr Admin realted orders types
+export interface AdminOrderState {
+	orderList: Order[];
+	orderDetails: Order | null;
+	isLoading: boolean;
+}
