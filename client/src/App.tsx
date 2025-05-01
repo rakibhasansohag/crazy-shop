@@ -21,6 +21,8 @@ import { AuthState, checkAuth } from './store/auth-slice';
 import { AppDispatch } from './store/store';
 import { useEffect } from 'react';
 import Loading from './pages/loading';
+import PaypalReturnPage from './pages/shopping-view/paypal-return';
+import PaymentSuccessPage from './pages/shopping-view/paypal-success';
 
 function App() {
 	const { isAuthenticated, user, isLoading } = useSelector(
@@ -76,6 +78,8 @@ function App() {
 					<Route path='listing' element={<ShoppingListing />} />
 					<Route path='checkout' element={<ShoppingCheckout />} />
 					<Route path='account' element={<ShoppingAccount />} />
+					<Route path='paypal-return' element={<PaypalReturnPage />} />
+					<Route path='payment-success' element={<PaymentSuccessPage />} />
 				</Route>
 				<Route path='/unauth-page' element={<UnauthPage />} />
 				<Route path='*' element={<NotFound />} />
