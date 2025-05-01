@@ -2,16 +2,17 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 export interface AddressItem {
-	_id: string;
-	userId: string;
+	_id?: string;
+	userId?: string;
 	address: string;
 	city: string;
 	pincode: string;
 	phone: string;
 	notes: string;
-	createdAt: string;
-	updatedAt: string;
-	__v: number;
+	createdAt?: string;
+	updatedAt?: string;
+	__v?: number;
+	addressId?: string;
 }
 
 interface AddressState {

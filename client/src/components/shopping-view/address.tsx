@@ -119,7 +119,7 @@ const Address = ({ setCurrentSelectedAddress, selectedId }: AddressProps) => {
 
 	const handleDeleteAddress = (address: AddressItem) => {
 		if (!userId) return;
-		dispatch(deleteAddress({ userId, addressId: address._id }))
+		dispatch(deleteAddress({ userId, addressId: address?._id || '' }))
 			.unwrap()
 			.then((res) => {
 				if (res.success) toast.success('Address deleted');
@@ -127,7 +127,7 @@ const Address = ({ setCurrentSelectedAddress, selectedId }: AddressProps) => {
 	};
 
 	const handleEditAddress = (address: AddressItem) => {
-		setCurrentEditedId(address._id);
+		setCurrentEditedId(address?._id || '');
 		setFormData({
 			address: address.address,
 			city: address.city,
@@ -140,16 +140,22 @@ const Address = ({ setCurrentSelectedAddress, selectedId }: AddressProps) => {
 	return (
 		<Card>
 			<div className='mb-5 p-3 grid grid-cols-1 sm:grid-cols-2 gap-2'>
-				{addressList.map((addr) => (
-					<AddressCard
-						key={addr._id}
-						addressInfo={addr}
-						selectedId={selectedId}
-						setCurrentSelectedAddress={setCurrentSelectedAddress}
-						handleEditAddress={handleEditAddress}
-						handleDeleteAddress={handleDeleteAddress}
-					/>
-				))}
+				{addressList && addressList.length > 0 ? (
+					addressList.map((addr) => (
+						<AddressCard
+							key={addr._id}
+							addressInfo={addr}
+							selectedId={selectedId}
+							setCurrentSelectedAddress={setCurrentSelectedAddress}
+							handleEditAddress={handleEditAddress}
+							handleDeleteAddress={handleDeleteAddress}
+						/>
+					))
+				) : (
+					<p className='text-center text-sm text-gray-500'>
+						No addresses added. Please add an address first.
+					</p>
+				)}
 			</div>
 			<CardHeader>
 				<CardTitle>

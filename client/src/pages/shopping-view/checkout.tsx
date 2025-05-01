@@ -7,6 +7,11 @@ import { AppDispatch, RootState } from '../../store/store';
 import { useState } from 'react';
 import { AddressItem } from '../../store/shop/address-slice';
 import { Button } from '../../components/ui/button';
+import { toast } from 'sonner';
+import {
+	createNewOrder,
+	CreateOrderPayload,
+} from '../../store/shop/order-slice';
 
 export interface ShoppingCheckoutProps {
 	setCurrentSelectedAddress: (address: AddressItem) => void;
@@ -19,15 +24,19 @@ const ShoppingCheckout = () => {
 
 	const [isPaymentStart, setIsPaymentStart] = useState(false);
 
-	const { cartItems } = useSelector((state: RootState) => state.shopCart);
+	const { cartItems, cartId } = useSelector(
+		(state: RootState) => state.shopCart,
+	);
 	const { user } = useSelector((state: RootState) => state.auth);
-
+	const { approvalURL } = useSelector((state: RootState) => state.shopOrder);
 	const dispatch = useDispatch<AppDispatch>();
 
 	console.log({
 		setIsPaymentStart,
 		user,
 		dispatch,
+		cartItems,
+		cartId,
 	});
 
 	const totalCartAmount =
@@ -43,7 +52,60 @@ const ShoppingCheckout = () => {
 			  )
 			: 0;
 
-	const handleInitiatePaypalPayment = () => {};
+	function handleInitiatePaypalPayment() {
+		if (cartItems.length === 0) {
+			toast.error('Your cart is empty. Please add items to cart.');
+
+			return;
+		}
+		if (currentSelectedAddress === null) {
+			toast.error('Please select an address to place order.');
+			return;
+		}
+
+		const orderData: CreateOrderPayload = {
+			userId: user?.id || '',
+			cartId: cartId || '',
+			cartItems: cartItems.map((singleCartItem) => ({
+				productId: singleCartItem?.productId,
+				title: singleCartItem?.title,
+				image: singleCartItem?.image,
+				price:
+					singleCartItem?.salePrice > 0
+						? singleCartItem?.salePrice
+						: singleCartItem?.price,
+				quantity: singleCartItem?.quantity,
+			})),
+			addressInfo: {
+				addressId: currentSelectedAddress?._id,
+				address: currentSelectedAddress?.address,
+				city: currentSelectedAddress?.city,
+				pincode: currentSelectedAddress?.pincode,
+				phone: currentSelectedAddress?.phone,
+				notes: currentSelectedAddress?.notes,
+			},
+			orderStatus: 'pending',
+			paymentMethod: 'paypal',
+			paymentStatus: 'pending',
+			totalAmount: totalCartAmount,
+			orderDate: new Date(),
+			orderUpdateDate: new Date(),
+			paymentId: '',
+			payerId: '',
+		};
+
+		dispatch(createNewOrder(orderData)).then((data) => {
+			if (data.meta.requestStatus === 'fulfilled') {
+				setIsPaymentStart(true);
+			} else {
+				setIsPaymentStart(false);
+			}
+		});
+	}
+
+	if (approvalURL) {
+		window.location.href = approvalURL;
+	}
 
 	return (
 		<div className='flex flex-col'>

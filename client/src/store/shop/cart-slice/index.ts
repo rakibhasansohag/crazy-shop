@@ -35,7 +35,9 @@ export type CartState = {
 	cartItems: CartItem[];
 	isLoading: boolean;
 	error?: string;
+	cartId?: string;
 };
+
 const initialState: CartState = {
 	cartItems: [],
 	isLoading: false,
@@ -127,6 +129,7 @@ const shoppingCartSlice = createSlice({
 				state.isLoading = false;
 				if (action.payload.success && action.payload.data) {
 					state.cartItems = action.payload.data.items;
+					state.cartId = action.payload.data._id;
 				}
 			})
 			.addCase(fetchCartItems.rejected, (state, action) => {

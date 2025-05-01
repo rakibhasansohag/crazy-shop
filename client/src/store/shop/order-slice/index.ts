@@ -1,10 +1,34 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { Product } from '../../admin/products-slice';
+import { AddressItem } from '../address-slice';
+import { CartItem } from '../cart-slice';
 
 export type OrderData = {
 	approvalURL: string | null;
 	orderId: string | null;
+};
+
+export type OrderDataCreate = {
+	userId: string;
+	cartId: string;
+	cartItems: CartItem[];
+	addressInfo: {
+		addressId: string;
+		address: string;
+		city: string;
+		pincode: string;
+		phone: string;
+		notes?: string;
+	};
+	orderStatus: 'pending' | 'confirmed' | 'shipped' | 'delivered';
+	paymentMethod: 'paypal' | 'stripe' | 'cash';
+	paymentStatus: 'pending' | 'paid' | 'failed';
+	totalAmount: number;
+	orderDate: Date;
+	orderUpdateDate: Date;
+	paymentId?: string;
+	payerId?: string;
 };
 
 export type OrderDetails = {
@@ -27,6 +51,36 @@ export type OrderState = {
 	orderDetails: OrderDetails | null;
 };
 
+export type AddressInfo = {
+	addressId: string;
+	address: string;
+	city: string;
+	pincode: string;
+	phone: string;
+	notes: string;
+};
+
+export type CreateOrderPayload = {
+	userId: string;
+	cartId: string;
+	cartItems: {
+		productId: string;
+		title: string;
+		image: string;
+		price: number;
+		quantity: number;
+	}[];
+	addressInfo: AddressItem;
+	orderStatus: string;
+	paymentMethod: string;
+	paymentStatus: string;
+	totalAmount: number;
+	orderDate: Date;
+	orderUpdateDate: Date;
+	paymentId: string;
+	payerId: string;
+};
+
 const initialState: OrderState = {
 	approvalURL: null,
 	isLoading: false,
@@ -35,17 +89,20 @@ const initialState: OrderState = {
 	orderDetails: null,
 };
 
-export const createNewOrder = createAsyncThunk(
-	'/order/createNewOrder',
-	async (orderData) => {
-		const response = await axios.post(
-			'http://localhost:4000/api/shop/order/create',
-			orderData,
-		);
-
-		return response.data;
+export const createNewOrder = createAsyncThunk<
+	{
+		approvalURL: string;
+		orderId: string;
 	},
-);
+	CreateOrderPayload
+>('/order/createNewOrder', async (orderData) => {
+	const response = await axios.post<{ approvalURL: string; orderId: string }>(
+		'http://localhost:4000/api/shop/order/create',
+		orderData,
+	);
+
+	return response.data;
+});
 
 export const capturePayment = createAsyncThunk<
 	{ paymentId: string; payerId: string; orderId: string },
