@@ -95,8 +95,9 @@ const ShoppingListing = () => {
 	const { productList, productDetails } = useSelector(
 		(state: RootState) => state.shopProducts,
 	);
+	const { cartItems } = useSelector((state: RootState) => state.shopCart);
+
 	const { user } = useSelector((state: RootState) => state.auth);
-	
 
 	useEffect(() => {
 		if (filters !== null && sort !== null)
@@ -114,10 +115,31 @@ const ShoppingListing = () => {
 		dispatch(fetchProductDetails(getCurrentProductId));
 	}
 
-	const handleAddToCart = (getCurrentProductId: string) => {
+	const handleAddToCart = (
+		getCurrentProductId: string,
+		getTotalStock: number,
+	) => {
 		if (!user?.id) {
 			toast.error('You must be logged in to add items to cart');
 			return;
+		}
+
+		const getCartItems = cartItems || [];
+
+		if (getCartItems.length) {
+			const indexOfCurrentItem = getCartItems.findIndex(
+				(item) => item.productId === getCurrentProductId,
+			);
+			if (indexOfCurrentItem > -1) {
+				const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+				if (getQuantity + 1 > getTotalStock) {
+					toast.error(
+						`Only ${getQuantity} quantity can be added for this item`,
+					);
+
+					return;
+				}
+			}
 		}
 
 		dispatch(
@@ -131,7 +153,7 @@ const ShoppingListing = () => {
 
 			if (payload?.success) {
 				toast.success('Product added to cart successfully');
-				dispatch(fetchCartItems({ userId: user.id }));
+				dispatch(fetchCartItems({ userId: user?.id }));
 			} else {
 				toast.error(payload?.message || 'Failed to add to cart');
 			}

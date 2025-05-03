@@ -42,14 +42,12 @@ function AdminOrderDetailsView({ orderDetails }: OrderDataCreateProps) {
 		).then((data) => {
 			if (data?.meta?.requestStatus === 'fulfilled') {
 				dispatch(getOrderDetailsForAdmin(orderDetails?._id || ''));
-				dispatch(getAllOrdersForAdmin());
+				dispatch(getAllOrdersForAdmin()); 
 				setFormData(initialFormData);
 				toast.success('Order status updated successfully');
 			}
 		});
 	}
-
-	console.log(orderDetails);
 
 	return (
 		<DialogContent className='sm:max-w-[600px]'>
