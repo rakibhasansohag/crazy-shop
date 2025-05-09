@@ -15,7 +15,7 @@ import { AppDispatch, RootState } from '../../store/store';
 import { toast } from 'sonner';
 import ShoppingProductTile from '../../components/shopping-view/shopping-product-tile';
 import { Product } from '../../store/admin/products-slice';
-
+ 
 function SearchProducts() {
 	const [keyword, setKeyword] = useState('');
 	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
