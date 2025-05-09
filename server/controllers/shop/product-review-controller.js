@@ -53,6 +53,7 @@ const addProductReview = async (req, res) => {
 		res.status(201).json({
 			success: true,
 			data: newReview,
+			message: 'Review added successfully',
 		});
 	} catch (e) {
 		console.log(e);
@@ -71,6 +72,7 @@ const getProductReviews = async (req, res) => {
 		res.status(200).json({
 			success: true,
 			data: reviews,
+			message: 'Reviews fetched successfully',
 		});
 	} catch (e) {
 		console.log(e);

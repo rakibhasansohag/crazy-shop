@@ -1,4 +1,3 @@
-import { StarIcon } from 'lucide-react';
 import { Product } from '../../store/admin/products-slice';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -6,11 +5,13 @@ import { Dialog, DialogContent } from '../ui/dialog';
 import { Separator } from '../ui/separator';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store/store';
 import { setProductDetails } from '../../store/shop/products-slice';
 import StarRatingComponent from '../common/star-rating';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { addReview, getReviews } from '../../store/shop/review-slice';
+import { toast } from 'sonner';
 
 type ProductDetailsDialogProps = {
 	openDetailsDialog: boolean;
@@ -29,6 +30,11 @@ const ProductDetailsDialog = ({
 	const [rating, setRating] = useState(0);
 	const dispatch = useDispatch<AppDispatch>();
 
+	const { reviews, isLoading } = useSelector(
+		(state: RootState) => state.shopReviews,
+	);
+	const { user } = useSelector((state: RootState) => state.auth);
+
 	// close dialog from outside
 	const handleDialogClose = () => {
 		setOpenDetailsDialog(false);
@@ -39,6 +45,46 @@ const ProductDetailsDialog = ({
 		console.log(newRating, 'newRating');
 		setRating(newRating);
 	};
+
+	const handleAddReview = () => {
+		if (!productDetails?._id || !user?.id) return;
+
+		dispatch(
+			addReview({
+				productId: productDetails._id,
+				userId: user.id,
+				userName: user.userName || 'Anonymous',
+				reviewMessage: reviewMsg,
+				reviewValue: rating,
+			}),
+		)
+			.unwrap()
+			.then(() => {
+				setRating(0);
+				setReviewMsg('');
+				dispatch(getReviews(productDetails._id));
+				toast.success('Review added successfully');
+			})
+			.catch((error) => {
+				toast.error(
+					error || error?.err || error?.message || 'An error occurred',
+				);
+			});
+	};
+
+	useEffect(() => {
+		if (productDetails?._id) {
+			dispatch(getReviews(productDetails._id));
+		}
+	}, [productDetails?._id, dispatch]);
+
+	const averageReview =
+		reviews && reviews.length > 0
+			? reviews.reduce((sum, reviewItem) => sum + reviewItem.reviewValue, 0) /
+			  reviews.length
+			: 0;
+
+	if (!productDetails) return null;
 
 	return (
 		<Dialog open={openDetailsDialog} onOpenChange={handleDialogClose}>
@@ -77,13 +123,9 @@ const ProductDetailsDialog = ({
 					</div>
 
 					{/* Point :  Afverage rating */}
-					<div className='flex items center gap-2 '>
+					<div className='flex items center gap-2 mt-2'>
 						<div className='flex gap-1 items-center'>
-							<StarIcon className='w-5 h-5 fill-primary' />
-							<StarIcon className='w-5 h-5 fill-primary' />
-							<StarIcon className='w-5 h-5 fill-primary' />
-							<StarIcon className='w-5 h-5 fill-primary' />
-							<StarIcon className='w-5 h-5 fill-primary' />
+							<StarRatingComponent rating={averageReview} />
 						</div>
 						<span className='text-muted-foreground'>(4.58)</span>
 					</div>
@@ -98,7 +140,6 @@ const ProductDetailsDialog = ({
 							<Button
 								className='w-full'
 								onClick={() =>
-									// /TODO : need to update the hanlde cart error handling if the stock is finished added an error message
 									handleAddToCart(
 										productDetails?._id as string,
 										productDetails?.totalStock as number,
@@ -113,69 +154,33 @@ const ProductDetailsDialog = ({
 					<Separator className='my-10' />
 					<div className='max-h-[300px] overflow-auto'>
 						<h2 className='text-xl font-bold mb-4'>Reviews</h2>
-						<div className='grid gap-6 '>
-							<div className='flex gap-4'>
-								<Avatar className='w-10 h-10 border'>
-									<AvatarFallback>RS</AvatarFallback>
-								</Avatar>
-								<div className='grid gap-1.5'>
-									<div className='flex gap-2 items-center'>
-										<h3 className='font-bold leading-none'>
-											Rakib Hasan Sohag
-										</h3>
+						<div className='grid gap-6 '></div>
+						{isLoading ? (
+							<div>Loading Reviews...</div>
+						) : reviews && reviews.length > 0 ? (
+							reviews.map((reviewItem) => (
+								<div className='flex gap-4' key={reviewItem._id}>
+									<Avatar className='w-10 h-10 border'>
+										<AvatarFallback>
+											{reviewItem?.userName[0].toUpperCase()}
+										</AvatarFallback>
+									</Avatar>
+									<div className='grid gap-1'>
+										<div className='flex items-center gap-2'>
+											<h3 className='font-bold'>{reviewItem?.userName}</h3>
+										</div>
+										<div className='flex items-center gap-0.5'>
+											<StarRatingComponent rating={reviewItem?.reviewValue} />
+										</div>
+										<p className='text-muted-foreground'>
+											{reviewItem.reviewMessage}
+										</p>
 									</div>
-									<div className='flex gap-1 items-center'>
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-									</div>
-									<p className='text-muted-foreground'>This is a nice proect</p>
 								</div>
-							</div>
-							<div className='flex gap-4'>
-								<Avatar className='w-10 h-10 border'>
-									<AvatarFallback>RS</AvatarFallback>
-								</Avatar>
-								<div className='grid gap-1.5'>
-									<div className='flex gap-2 items-center'>
-										<h3 className='font-bold leading-none'>
-											Rakib Hasan Sohag
-										</h3>
-									</div>
-									<div className='flex gap-1 items-center'>
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-									</div>
-									<p className='text-muted-foreground'>This is a nice proect</p>
-								</div>
-							</div>
-							<div className='flex gap-4'>
-								<Avatar className='w-10 h-10 border'>
-									<AvatarFallback>RS</AvatarFallback>
-								</Avatar>
-								<div className='grid gap-1.5'>
-									<div className='flex gap-2 items-center'>
-										<h3 className='font-bold leading-none'>
-											Rakib Hasan Sohag
-										</h3>
-									</div>
-									<div className='flex gap-1 items-center'>
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-										<StarIcon className='w-5 h-5 fill-primary' />
-									</div>
-									<p className='text-muted-foreground'>This is a nice proect</p>
-								</div>
-							</div>
-						</div>
-
+							))
+						) : (
+							<h1>No Reviews</h1>
+						)}
 						{/* Point : to handle add review */}
 						<div className='mt-10 flex-col flex gap-2'>
 							<Label>Write a review</Label>
@@ -191,7 +196,12 @@ const ProductDetailsDialog = ({
 								name='reviewMsg'
 								placeholder='Write a review...'
 							/>
-							<Button>Submit</Button>
+							<Button
+								onClick={handleAddReview}
+								disabled={reviewMsg.trim() === ''}
+							>
+								{reviewMsg.trim() === '' ? 'Write a review' : 'Submit Review'}
+							</Button>
 						</div>
 					</div>
 				</div>

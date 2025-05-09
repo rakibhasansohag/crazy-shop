@@ -1,44 +1,61 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-interface Review {
+export type Review = {
 	_id: string;
-	user: string;
-	rating: number;
-	comment: string;
+	productId: string;
+	userId: string;
+	userName: string;
+	reviewMessage: string;
+	reviewValue: number;
 	createdAt: string;
-}
+	updatedAt: string;
+};
 
-interface ReviewState {
+export type AddReviewPayload = {
+	productId: string;
+	userId: string;
+	userName: string;
+	reviewMessage: string;
+	reviewValue: number;
+};
+
+type ReviewState = {
 	isLoading: boolean;
 	reviews: Review[];
-}
+};
 
 const initialState: ReviewState = {
 	isLoading: false,
 	reviews: [],
 };
 
-export const addReview = createAsyncThunk<Review | undefined, FormData>(
-	'/order/addReview',
-	async (formdata) => {
-		const response = await axios.post(
-			`http://localhost:4000/api/shop/review/add`,
-			formdata,
-		);
-
-		return response.data;
+export const addReview = createAsyncThunk<Review, AddReviewPayload>(
+	'/reviews/addReview',
+	async (reviewData, { rejectWithValue }) => {
+		try {
+			const response = await axios.post(
+				'http://localhost:4000/api/shop/review/add',
+				reviewData,
+			);
+			return response.data.data;
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				return rejectWithValue(error.response?.data?.message || error.message);
+			}
+			return rejectWithValue('An unexpected error occurred');
+		}
 	},
 );
 
-export const getReviews = createAsyncThunk<{ data: Review[] }>(
-	'/order/getReviews',
-	async (id) => {
+export const getReviews = createAsyncThunk<Review[], string>(
+	'/reviews/getReviews',
+	async (productId) => {
 		const response = await axios.get(
-			`http://localhost:4000/api/shop/review/${id}`,
+			`http://localhost:4000/api/shop/review/${productId}`,
 		);
 
-		return response.data;
+		return response.data.data;
 	},
 );
 
@@ -53,11 +70,14 @@ const reviewSlice = createSlice({
 			})
 			.addCase(getReviews.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.reviews = action.payload.data;
+				state.reviews = action.payload;
 			})
 			.addCase(getReviews.rejected, (state) => {
 				state.isLoading = false;
 				state.reviews = [];
+			})
+			.addCase(addReview.fulfilled, (state, action) => {
+				state.reviews = [...state.reviews, action.payload];
 			});
 	},
 });
