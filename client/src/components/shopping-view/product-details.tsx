@@ -73,6 +73,9 @@ const ProductDetailsDialog = ({
 	};
 
 	useEffect(() => {
+		setReviewMsg('');
+		setRating(0);
+
 		if (productDetails?._id) {
 			dispatch(getReviews(productDetails._id));
 		}
