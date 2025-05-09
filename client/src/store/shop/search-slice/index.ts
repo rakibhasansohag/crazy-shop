@@ -1,13 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { Product } from '../../admin/products-slice';
 
-const initialState = {
+type SearchState = {
+	isLoading: boolean;
+	searchResults: Product[];
+};
+
+type SearchResults = {
+	data: Product[];
+};
+
+const initialState: SearchState = {
 	isLoading: false,
 	searchResults: [],
 };
 
-export const getSearchResults = createAsyncThunk(
-	'/order/getSearchResults',
+export const getSearchResults = createAsyncThunk<SearchResults, string>(
+	'/search/getSearchResults',
 	async (keyword) => {
 		const response = await axios.get(
 			`http://localhost:4000/api/shop/search/${keyword}`,

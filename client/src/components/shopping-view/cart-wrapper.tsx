@@ -34,7 +34,12 @@ const UserCartWrapper = ({ cartItems, setOpenCartSheet }: Props) => {
 			</SheetHeader>
 			<div className='mt-8 space-y-4'>
 				{cartItems && cartItems.length > 0
-					? cartItems.map((item) => <UserCartItemsContent cartItem={item} />)
+					? cartItems.map((item) => (
+							<UserCartItemsContent
+								cartItem={item}
+								key={item?._id || item?.image}
+							/>
+					  ))
 					: null}
 			</div>
 

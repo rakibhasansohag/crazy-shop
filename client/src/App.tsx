@@ -23,6 +23,7 @@ import { useEffect } from 'react';
 import Loading from './pages/loading';
 import PaypalReturnPage from './pages/shopping-view/paypal-return';
 import PaymentSuccessPage from './pages/shopping-view/paypal-success';
+import SearchProducts from './pages/shopping-view/search-products';
 
 function App() {
 	const { isAuthenticated, user, isLoading } = useSelector(
@@ -80,6 +81,7 @@ function App() {
 					<Route path='account' element={<ShoppingAccount />} />
 					<Route path='paypal-return' element={<PaypalReturnPage />} />
 					<Route path='payment-success' element={<PaymentSuccessPage />} />
+					<Route path='search' element={<SearchProducts />} />
 				</Route>
 				<Route path='/unauth-page' element={<UnauthPage />} />
 				<Route path='*' element={<NotFound />} />

@@ -107,7 +107,7 @@ const ShoppingHome = () => {
 				sortParams: 'price_asc',
 			}),
 		);
-	});
+	}, [dispatch]);
 
 	return (
 		<div className='flex flex-col min-h-screen'>
