@@ -15,6 +15,7 @@ const shopCartRouter = require('./routes/shop/cart-routes.js');
 const shopAddressRouter = require('./routes/shop/address-routes.js');
 const shopOrderRouter = require('./routes/shop/order-routes.js');
 const shopSearchRouter = require('./routes/shop/search-routes.js');
+const shopReviewRouter = require('./routes/shop/review-routes.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -66,7 +67,7 @@ app.use('/api/shop/cart', shopCartRouter);
 app.use('/api/shop/address', shopAddressRouter);
 app.use('/api/shop/order', shopOrderRouter);
 app.use('/api/shop/search', shopSearchRouter);
-
+app.use('/api/shop/review', shopReviewRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
