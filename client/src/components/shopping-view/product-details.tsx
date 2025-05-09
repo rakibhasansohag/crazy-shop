@@ -9,6 +9,8 @@ import { Input } from '../ui/input';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
 import { setProductDetails } from '../../store/shop/products-slice';
+import StarRatingComponent from '../common/star-rating';
+import { useState } from 'react';
 
 type ProductDetailsDialogProps = {
 	openDetailsDialog: boolean;
@@ -23,12 +25,19 @@ const ProductDetailsDialog = ({
 	productDetails,
 	handleAddToCart,
 }: ProductDetailsDialogProps) => {
+	const [reviewMsg, setReviewMsg] = useState('');
+	const [rating, setRating] = useState(0);
 	const dispatch = useDispatch<AppDispatch>();
 
 	// close dialog from outside
 	const handleDialogClose = () => {
 		setOpenDetailsDialog(false);
 		dispatch(setProductDetails());
+	};
+
+	const handleRatingChange = (newRating: number) => {
+		console.log(newRating, 'newRating');
+		setRating(newRating);
 	};
 
 	return (
@@ -171,15 +180,17 @@ const ProductDetailsDialog = ({
 						<div className='mt-10 flex-col flex gap-2'>
 							<Label>Write a review</Label>
 							<div className='flex gap-1'>
-								<div className='flex gap-1 items-center'>
-									<StarIcon className='w-5 h-5 fill-primary' />
-									<StarIcon className='w-5 h-5 fill-primary' />
-									<StarIcon className='w-5 h-5 fill-primary' />
-									<StarIcon className='w-5 h-5 fill-primary' />
-									<StarIcon className='w-5 h-5 fill-primary' />
-								</div>
+								<StarRatingComponent
+									rating={rating}
+									handleRatingChange={handleRatingChange}
+								/>
 							</div>
-							<Input name='reviewMsg' placeholder='Write a review...' />
+							<Input
+								value={reviewMsg}
+								onChange={(event) => setReviewMsg(event.target.value)}
+								name='reviewMsg'
+								placeholder='Write a review...'
+							/>
 							<Button>Submit</Button>
 						</div>
 					</div>
