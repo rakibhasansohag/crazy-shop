@@ -31,14 +31,6 @@ const ShoppingCheckout = () => {
 	const { approvalURL } = useSelector((state: RootState) => state.shopOrder);
 	const dispatch = useDispatch<AppDispatch>();
 
-	console.log({
-		setIsPaymentStart,
-		user,
-		dispatch,
-		cartItems,
-		cartId,
-	});
-
 	const totalCartAmount =
 		cartItems && cartItems && cartItems.length > 0
 			? cartItems.reduce(
@@ -62,6 +54,8 @@ const ShoppingCheckout = () => {
 			toast.error('Please select an address to place order.');
 			return;
 		}
+
+		setIsPaymentStart(true);
 
 		const orderData: CreateOrderPayload = {
 			userId: user?.id || '',
@@ -94,13 +88,16 @@ const ShoppingCheckout = () => {
 			payerId: '',
 		};
 
-		dispatch(createNewOrder(orderData)).then((data) => {
-			if (data.meta.requestStatus === 'fulfilled') {
-				setIsPaymentStart(true);
-			} else {
-				setIsPaymentStart(false);
-			}
-		});
+		dispatch(createNewOrder(orderData))
+			.then((data) => {
+				if (data.meta.requestStatus === 'fulfilled') {
+					setIsPaymentStart(true);
+				} else {
+					setIsPaymentStart(false);
+				}
+			})
+			.catch(() => setIsPaymentStart(false))
+			.finally(() => setIsPaymentStart(false));
 	}
 
 	if (approvalURL) {
