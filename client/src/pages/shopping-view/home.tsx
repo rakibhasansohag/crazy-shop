@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import bannerOne from '../../assets/banner-1.webp';
-import bannerTwo from '../../assets/banner-2.webp';
-import bannerThree from '../../assets/banner-3.webp';
+
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,9 +20,9 @@ import ProductDetailsDialog from '../../components/shopping-view/product-details
 import { BrandsWithIcon, CategoriesWithIcon } from '../../config';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getFeatureImages } from '../../store/common-slice';
 
 const ShoppingHome = () => {
-	const slides = [bannerOne, bannerTwo, bannerThree];
 	const [currentSlide, setCurrentSlide] = useState(0);
 	const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
@@ -35,12 +33,9 @@ const ShoppingHome = () => {
 		(state: RootState) => state.shopProducts,
 	);
 	const { user } = useSelector((state: RootState) => state.auth);
-
-	console.dir({
-		productDetails,
-		productList,
-		user,
-	});
+	const { featureImageList } = useSelector(
+		(state: RootState) => state.commonFeature,
+	);
 
 	function handleNavigateToListingPage(
 		getCurrentItem: {
@@ -92,13 +87,13 @@ const ShoppingHome = () => {
 
 	useEffect(() => {
 		const timer = setInterval(() => {
-			setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+			setCurrentSlide((prevSlide) => (prevSlide + 1) % featureImageList.length);
 		}, 5000);
 
 		return () => {
 			clearInterval(timer);
 		};
-	}, [slides.length]);
+	}, [featureImageList]);
 
 	useEffect(() => {
 		dispatch(
@@ -109,25 +104,33 @@ const ShoppingHome = () => {
 		);
 	}, [dispatch]);
 
+	useEffect(() => {
+		dispatch(getFeatureImages());
+	}, [dispatch]);
+
 	return (
 		<div className='flex flex-col min-h-screen'>
 			<div className='relative w-full h-[600px] overflow-hidden '>
-				{slides.map((slide, index) => (
-					<img
-						src={slide}
-						key={index}
-						className={` ${
-							index === currentSlide ? 'opacity-100' : 'opacity-0'
-						} absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
-						alt={`banner-${index + 1}`}
-					/>
-				))}
+				{featureImageList && featureImageList.length > 0
+					? featureImageList.map((slide, index) => (
+							<img
+								src={slide?.image}
+								key={index}
+								className={` ${
+									index === currentSlide ? 'opacity-100' : 'opacity-0'
+								} absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
+								alt={`banner-${index + 1}`}
+							/>
+					  ))
+					: null}
 				<Button
 					variant='outline'
 					size='icon'
 					onClick={() =>
 						setCurrentSlide(
-							(prevSlide) => (prevSlide - 1 + slides.length) % slides.length,
+							(prevSlide) =>
+								(prevSlide - 1 + featureImageList.length) %
+								featureImageList.length,
 						)
 					}
 					className='absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80'
@@ -138,7 +141,9 @@ const ShoppingHome = () => {
 					variant='outline'
 					size='icon'
 					onClick={() =>
-						setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length)
+						setCurrentSlide(
+							(prevSlide) => (prevSlide + 1) % featureImageList.length,
+						)
 					}
 					className='absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80'
 				>

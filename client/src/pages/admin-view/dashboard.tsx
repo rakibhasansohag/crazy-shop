@@ -64,7 +64,7 @@ function AdminDashboard() {
 							<div className='relative' key={featureImgItem._id}>
 								<img
 									src={featureImgItem.image}
-									className='w-full h-[300px] object-cover rounded-t-lg'
+									className='w-full h-[350px] object-cover rounded-t-lg'
 								/>
 							</div>
 					  ))
