@@ -42,6 +42,10 @@ function App() {
 			{/* Point: all the common components goes here */}
 			<Routes>
 				<Route
+					path='/'
+					element={<CheckAuth isAuthenticated={isAuthenticated} user={user} />}
+				/>
+				<Route
 					path='/auth'
 					element={
 						<CheckAuth isAuthenticated={isAuthenticated} user={user}>

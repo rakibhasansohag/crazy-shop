@@ -5,7 +5,7 @@ interface CheckAuthProps {
 	user: {
 		role: string;
 	} | null;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 }
 
 /**
@@ -23,8 +23,6 @@ interface CheckAuthProps {
  */
 function CheckAuth({ isAuthenticated, user, children }: CheckAuthProps) {
 	const location = useLocation();
-
-	console.log(location.pathname, isAuthenticated);
 
 	if (location.pathname === '/') {
 		if (!isAuthenticated) {
