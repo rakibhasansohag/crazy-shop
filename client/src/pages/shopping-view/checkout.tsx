@@ -8,10 +8,8 @@ import { useState } from 'react';
 import { AddressItem } from '../../store/shop/address-slice';
 import { Button } from '../../components/ui/button';
 import { toast } from 'sonner';
-import {
-	createNewOrder,
-	CreateOrderPayload,
-} from '../../store/shop/order-slice';
+import { createNewOrder } from '../../store/shop/order-slice';
+import { Order } from '../../types/order';
 
 export interface ShoppingCheckoutProps {
 	setCurrentSelectedAddress: (address: AddressItem) => void;
@@ -57,7 +55,7 @@ const ShoppingCheckout = () => {
 
 		setIsPaymentStart(true);
 
-		const orderData: CreateOrderPayload = {
+		const orderData: Order = {
 			userId: user?.id || '',
 			cartId: cartId || '',
 			cartItems: cartItems.map((singleCartItem) => ({
@@ -71,7 +69,7 @@ const ShoppingCheckout = () => {
 				quantity: singleCartItem?.quantity,
 			})),
 			addressInfo: {
-				addressId: currentSelectedAddress?._id,
+				addressId: currentSelectedAddress?._id || '',
 				address: currentSelectedAddress?.address,
 				city: currentSelectedAddress?.city,
 				pincode: currentSelectedAddress?.pincode,
